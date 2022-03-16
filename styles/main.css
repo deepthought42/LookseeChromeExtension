@@ -1,0 +1,108 @@
+body {
+  padding: 0px !important;
+  margin: 0px !important;
+}
+
+.btn {
+  color: #ffffff;
+  background-color: #6649e4;
+}
+.btn:focus,
+.btn.focus {
+  color: #fff !important;
+  background-color: #553fc0;
+}
+.btn:hover {
+  color: #fff !important;
+  background-color: #553fc0;
+}
+.btn:active,
+.btn.active {
+  color: #fff !important;
+  background-color: #553fc0;
+}
+
+.btn-sm {
+  padding: 5px 5px !important;
+  font-size: 0.8em !important;
+}
+
+.row {
+  padding: 0px;
+  margin: 0px;
+}
+
+.col-xs-12 {
+  padding: 0px;
+}
+
+.path-container {
+  height: 52%;
+  min-height: 100px;
+  background-color: #f4f4f8;
+  padding: 0px;
+  overflow: auto;
+}
+
+.spacer {
+  height: 15px;
+}
+
+.path-element {
+  height: auto;
+  padding: 0px 0px;
+  border: solid 1px;
+  font-size: .65em;
+}
+
+.btn-sm {
+  padding: 3px 3px !important;
+  font-size: 0.8em !important;
+}
+
+.spacer {
+  height: 15px;
+}
+
+
+.path-element-value {
+  padding: 0px 0px 0px 5px;
+  word-wrap: break-word;
+}
+
+.icons {
+  padding: 0px 0px;
+}
+
+.icons .icon {
+  padding: 0px 3px;
+}
+
+.delete-icon {
+  color: red;
+}
+
+.col-xs-10 {
+  padding: 0px !important;
+}
+
+.col-xs-2 {
+  padding: 0px 5px !important;
+}
+
+@-o-keyframes fadeIt {
+  0%   { background-color: #FFFFFF; }
+  50%  { background-color: #ffdc05; }
+  100% { background-color: #FFFFFF; }
+}
+@keyframes fadeIt {
+  0%   { background-color: #FFFFFF; }
+  50%  { background-color: #ffdc05; }
+  100% { background-color: #FFFFFF; }
+}
+
+.highlighted-background{
+    background-image:none !important;
+         -o-animation: fadeIt 5s ease-in-out;
+            animation: fadeIt 10s ease-in-out;
+}
