@@ -18,8 +18,8 @@ let selector_status = "disabled";
 
 let close_ide = function(){
   //hide parent element
-  var qanairy_ide = document.getElementById("qanairy_ide");
-  qanairy_ide.style.display = "none";
+  var looksee_ide = document.getElementById("looksee_ide");
+  looksee_ide.style.display = "none";
 
   //reset localStorage
   localStorage.removeItem("path");

@@ -1,7 +1,7 @@
 {
-  "name": "qanairy-ide",
+  "name": "look-see",
   "version": "0.1.0",
-  "description": "Qanairy IDE allows you to record tests easily",
+  "description": "Look-see helps find and fix accessibility issues",
   "main": "background.js",
   "dependencies": {
     "auth0-chrome": "^0.1.0",
@@ -13,12 +13,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deepthought42/QanairyIDE.git"
+    "url": "git+https://github.com/deepthought42/LookseeChromeExtension.git"
   },
   "author": "Qanairy Inc",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/deepthought42/QanairyIDE/issues"
+    "url": "https://github.com/deepthought42/LookseeChromeExtension/issues"
   },
-  "homepage": "https://github.com/deepthought42/QanairyIDE#readme"
+  "homepage": "https://github.com/deepthought42/LookseeChromeExtension#readme"
 }

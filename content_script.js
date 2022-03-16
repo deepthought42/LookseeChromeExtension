@@ -8,7 +8,7 @@ let selector_enabled = false;
 
 let close_recorder = function(){
   //hide parent element
-  document.getElementById("qanairy_ide").style.display = "none";
+  document.getElementById("looksee_ide").style.display = "none";
   //reset localStorage
   localStorage.clear();
 }
@@ -17,6 +17,16 @@ let logout = function(){
   localStorage.removeItem("authResult");
   close_recorder;
 }
+
+
+
+
+
+/************************************************************
+*
+* OLD QANAIRY CODE STARTS HERE. DELETE IF STILL HERE AFTER 8/1/2022
+*
+*************************************************************/
 
 let pause = function(milliseconds) {
 	var dt = new Date();
@@ -134,7 +144,7 @@ let recorderClickListener = function(event){
   var top_z_index = -10000;
   //get all elements on page
   document.querySelectorAll("body *").forEach(function(node){
-    if(node.id !== "qanairy_ide_frame" && node.id !== "qanairy_ide_header" && node.id !== "qanairy_ide_body" && node.id !== "qanairy_ide"){
+    if(node.id !== "looksee_ide_frame" && node.id !== "looksee_ide_header" && node.id !== "looksee_ide_body" && node.id !== "looksee_ide"){
       var rect = node.getBoundingClientRect();
       if(event.clientX >= rect.left && event.clientY >= rect.top && event.clientX <= rect.right && event.clientY <= rect.bottom){
         possible_nodes.push(node);
@@ -307,14 +317,14 @@ let main = function(){
   }
 
   // Make the DIV element draggable:
-  dragElement(document.getElementById("qanairy_ide"));
+  dragElement(document.getElementById("looksee_ide"));
 };
 
 var open_recorder = function(){
-  var elem = document.getElementById("qanairy_ide");
+  var elem = document.getElementById("looksee_ide");
   if(!elem){
     renderRecorder();
-    elem = document.getElementById("qanairy_ide");
+    elem = document.getElementById("looksee_ide");
   }
   elem.style.display = "block";
   main();
@@ -322,24 +332,24 @@ var open_recorder = function(){
 
 var renderRecorder = function(){
    var iframe = document.createElement("iframe");
-   iframe.id="qanairy_ide_frame";
+   iframe.id="looksee_ide_frame";
    iframe.style.cssText = "position:absolute;width:300px;height:550px;z-index:998";
    iframe.src = chrome.extension.getURL("/recorder.html");
 
-   var header_inner_html = "<span id='ide_close_icon' onclick=\"document.getElementById('qanairy_ide').style.display='none';localStorage.removeItem('path');\" style='display:block;cursor:pointer;z-index:999;position:absolute;top:0px; left:280px;height:20px;width:20px;margin:0px;padding:0px;color:#FFFFFF'><b>x</b></span>";
+   var header_inner_html = "<span id='ide_close_icon' onclick=\"document.getElementById('looksee_ide').style.display='none';localStorage.removeItem('path');\" style='display:block;cursor:pointer;z-index:999;position:absolute;top:0px; left:280px;height:20px;width:20px;margin:0px;padding:0px;color:#FFFFFF'><b>x</b></span>";
    var header = document.createElement("div");
    header.style.cssText = "width:300px;height:20px;z-index:998;background-color:#553fc0;cursor:grab";
-   header.id="qanairy_ide_header";
+   header.id="looksee_ide_header";
    header.innerHTML = header_inner_html;
 
    var body = document.createElement("div");
    body.style.cssText = "width:100%;height:20px";
-   body.id="qanairy_ide_body";
+   body.id="looksee_ide_body";
    body.appendChild(iframe);
 
    var parent = document.createElement("div");
    parent.style.cssText = "position:absolute;width:300px;height:600px;z-index:10000;left:20px;top:20px;padding:0px";
-   parent.id="qanairy_ide";
+   parent.id="looksee_ide";
    parent.style.display = "none";
    parent.appendChild(header);
    parent.appendChild(body);
@@ -395,7 +405,7 @@ chrome.runtime.onMessage.addListener(
 renderRecorder();
 main();
 if(localStorage.status === "recording" || localStorage.status === "editing" || localStorage.status === "RUNNING" || localStorage.status === "POST_RUN"){
-	document.getElementById("qanairy_ide").style.display = "block";
+	document.getElementById("looksee_ide").style.display = "block";
   if(localStorage.status === "editing"){
     //send path to recorder
     chrome.runtime.sendMessage({
