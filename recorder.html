@@ -10,102 +10,79 @@
     <div class="row spacer" >
     </div>
     <div class="row">
-      <div class="col-xs-12">
-        <button id="createNewTest" class="btn btn-sm col-xs-4" type="button">
-          <i class="far fa-trash-alt"></i> Clear All
-        </button>
-        <button id="startRecording" class="btn btn-sm col-xs-4" type="button">
-          <i class="fas fa-circle"></i> Start
-        </button>
-        <button id="stopRecording" class="btn btn-sm col-xs-4" type="button">
-          <i class="fas fa-stop" aria-hidden="true"></i> Stop
-        </button>
-        <button id="runTestButton" class="btn btn-sm col-xs-4" type="button">
-          <i class="fas fa-play" aria-hidden="true"></i> Run
-        </button>
+      <!-- text color palette box-->
+      <div class="col-xs-3">
+        <div>
+          Text
+        </div>
+        <div>
+          <div id="text_color">
+
+          </div>
+        </div>
+        <div id="text_hex_color">
+          
+        </div>
+      </div>
+
+      <!-- bg color palette box-->
+      <div class="col-xs-3">
+        <div>
+          Background
+        </div>
+        <div>
+          <div id="bg_color">
+
+          </div>
+        </div>
+        <div id="bg_hex_color">
+          
+        </div>
+      </div>
+
+      <!-- Contrast and compliance section -->
+      <div class="col-xs-6 container-fluid">
+        <div class="row">
+          <div>
+            Contrast
+          </div>
+          <div id="contrast">
+            
+          </div>
+        </div>
+        <div class="row">
+          <div id="contrast">
+            <img id="aaa_success" src=""/>
+            <img id="aaa_fail" src=""/>
+          </div>
+          <div>
+            AA - <span id="aa_small_text">4.5:1</span><span id="aa_large_text">3:1</span>
+          </div>
+        </div>
+        <div class="row">
+          <div id="contrast">
+            <img id="aaa_success" src=""/>
+            <img id="aaa_fail" src=""/>
+          </div>
+          <div>
+            AAA - <span id="aaa_small_text">7:1</span><span id="aaa_large_text">7:1</span>
+          </div>
+        </div>
       </div>
     </div>
 
     <div  id="test_path_viewer" class="path-container">
       <!-- path element list populates here -->
     </div>
-    <div id="manualPathElementDefinitionForms" class="row">
-      <div class="col-xs-12">
-        <button id="createPageButton" class="btn btn-sm col-xs-6">
-          <i class="fas fa-plus"></i> Add Page
-        </button>
-        <button id="createPageElementButton" class="btn btn-sm col-xs-6">
-          <i class="fas fa-plus"></i> Add Element
-        </button>
-      </div>
-      <div id="pageElementForm" class="col-xs-12">
-        <input type="hidden" id="pageElementIndexInPath"/>
-        <div class="col-xs-12">
-          <div>
-            Xpath
-          </div>
-          <div class="col-xs-12">
-            <input id="pageElementXpath" type="text" placeholder="xpath" class="col-xs-10"/>
-            <button id="element_selector" class="col-xs-2 btn btn-primary">
-              <i class="far fa-bullseye-pointer" ></i>
-            </button>
-          </div>
-        </div>
-        <div class="col-xs-12">
-          <div class="col-xs-4">
-            <div>
-              Action
-            </div>
-            <select id="actionName">
-              <option value="click">Click</option>
-              <option value="sendKeys">Send Keys</option>
-            </select>
-          </div>
-          <div class="col-xs-8" id="actionValueContainer">
-            <div>
-              Value
-            </div>
-            <div>
-              <input id="actionValue" type="text" placeholder="action value" />
-            </div>
-          </div>
-        </div>
-        <button id="savePageElementButton" class="col-xs-12">
-          <span id="add-element-btn-txt">Add</span>
-          <span id="save-element-btn-txt">Save</span>
-        </button>
-      </div>
-      <div id="pageForm" class="col-xs-12">
-        <input type="hidden" id="pageIndexInPath"/>
-        <div class="col-xs-12">
-          <input id="pageUrl" type="text" placeholder="http://www.example.com" class="col-xs-12"/>
-        </div>
-        <button id="savePageButton" class="col-xs-12">
-          <span id="add-page-btn-txt">Add</span>
-          <span id="save-page-btn-txt">Save</span>
-        </button>
-      </div>
-    </div>
+
     <div class="row spacer">
     </div>
     <div class="col-xs-12">
-      <button id="exportTest" type="button" class="btn btn-primary col-xs-12">
-        <span id="export_test_btn_text">Save Test</span>
-        <span id="export_test_btn_waiting_txt">
-          Saving test <i class="fa fa-spinner fa-spin"></i>
-        </span>
-      </button>
       <div id="export-404-error" style="color:red">
-        Qanairy servers are currently unresponsive. Please try again in a few minutes.
+        Look-see servers are currently unresponsive. Please try again in a few minutes.
       </div>
       <div id="export-error" style="color:red">
-        An error occurred while exporting your test. Please try again.
-      </div>
-      <div id="export_test_success_text" style="color:green">
-        Qanairy is building your test. We'll let you know when it's ready.
-      </div>
-      <div id="test_saved_successfully_msg" style="color:green">
-        Your test was created successfully
+        An error occurred while exporting your issues. Please try again.
       </div>
     </div>
   </body>

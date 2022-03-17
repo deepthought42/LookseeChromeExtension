@@ -1,5 +1,266 @@
 let $jquery = jQuery.noConflict();
 
+let close_ide = function(){
+  //hide parent element
+  var looksee_ide = document.getElementById("looksee_ide");
+  looksee_ide.style.display = "none";
+
+  //reset localStorage
+  localStorage.removeItem("path");
+  localStorage.removeItem("status");
+}
+
+/**
+ * draws element contrast colors
+ */
+let draw_element_contrast = function(font_size, font_weight, text_color, bg_color){
+  //draw text color in box with hex value below it
+  //draw bg color in box with hex value below it
+
+  //set text color in text color palette box
+  $jquery('#text_color').css('color', text_color);
+  $jquery('#text_hex_color').text(text_color);
+
+  
+  //set background color in bg color palette box
+  $jquery('#bg_color').css('background-color', bg_color);
+  $jquery('#bg_hex_color').text(text_color);
+
+  //calculate and set contrast value
+  let contrast = calculate_contrast(text_color, bg_color);
+  $jquery('#contrast').text(contrast);
+
+  let is_small_text = isSmallText(font_size, font_weight);
+  let aa_compliant = isAACompliant(is_small_text, contrast);
+  let aaa_compliant = isAAACompliant(is_small_text, contrast);
+
+  if(is_small_text){
+    $jquery('#aa_large_text').hide()
+    $jquery('#aaa_large_text').hide()
+    $jquery('#aa_small_text').show()
+    $jquery('#aaa_small_text').show()
+  }
+  else {
+    $jquery('#aa_large_text').show()
+    $jquery('#aaa_large_text').show()
+    $jquery('#aa_small_text').hide()
+    $jquery('#aaa_small_text').hide()
+  }
+
+  if(aa_compliant){
+    $jquery('#aa_success').show();
+    $jquery('#aa_fail').hide();
+  }
+  else {
+    $jquery('#aa_fail').show();
+    $jquery('#aa_success').hide();
+  }
+
+  if(aaa_compliant){
+    $jquery('#aaa_success').show();
+    $jquery('#aaa_fail').hide();
+  }
+  else {
+    $jquery('#aaa_fail').show();
+    $jquery('#aaa_success').hide();
+  }
+}
+
+/**
+ * Checks if text is considered small or large based on font size and weight
+ * 
+ * @param {Number} font_size 
+ * @param {String} font_weight 
+ * @returns 
+ */
+let isSmallText = function(font_size, font_weight){
+  if(font_size >= 14 && font_weight === 'bold' || font_size >= 18){
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
+let isAACompliant = function(is_small_text, contrast){
+  if(is_small_text){
+    if(contrast > 4.5){
+      return true;
+    }
+    else {
+       return false;
+    }
+  }
+  else {
+    if(contrast > 3){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+}
+
+let isAAACompliant = function(is_small_text, contrast){
+  if(is_small_text){
+    if(contrast > 7){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+  else {
+    if(contrast > 4.5){
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+}
+
+
+
+/**
+ * Calculates the color contrast of the text and background colors provided
+ * 
+ * @param {*} text_color 
+ * @param {*} bg_color 
+ */
+let calculate_contrast = function(text_color_luminance, bg_color_luminance){
+  let text_rgb = hexToRGB(text_color);
+  let text_luminance = calculate_brightness(text_rgb[0], text_rgb[1], text_rgb[2]);
+  
+  let bg_rgb = hexToRGB(bg_color);
+  let bg_luminance = calculate_brightness(bg_rgb[0], bg_rgb[1], bg_rgb[2]);
+
+  return Math.abs(text_luminance - bg_luminance)
+}
+
+/**
+ * Converts hex color value to rgb
+ * @param {*} hex color value
+ * @returns 
+ */
+let hexToRGB = function(h) {
+  let r = 0, g = 0, b = 0;
+
+  // 3 digits
+  if (h.length == 4) {
+    r = "0x" + h[1] + h[1];
+    g = "0x" + h[2] + h[2];
+    b = "0x" + h[3] + h[3];
+
+  // 6 digits
+  } else if (h.length == 7) {
+    r = "0x" + h[1] + h[2];
+    g = "0x" + h[3] + h[4];
+    b = "0x" + h[5] + h[6];
+  }
+  
+  return [r,g,b];
+}
+
+/**
+ * 
+ * @param {*} red 
+ * @param {*} green 
+ * @param {*} blue
+ *  
+ * @returns 
+ */
+let calculate_brightness = function(r,g,b) {
+  return 0.2126*r + 0.7152*g + 0.0722*b
+}
+
+/*
+ *  Exports issues to the Look-see platform. *
+ */
+$jquery("#exportIssue").on("click", function(element){
+  $jquery(this).prop("disabled",true);
+  $jquery("#export_test_btn_text").hide();
+  $jquery("#export_test_btn_waiting_txt").show();
+
+  var auth = JSON.parse(localStorage.getItem("authResult"));
+  var path = JSON.parse(localStorage.getItem("path"));
+
+  $jquery.ajax({
+
+    // The 'type' property sets the HTTP method.
+    // A value of 'PUT' or 'DELETE' will trigger a preflight request.
+    type: "POST",
+
+    // The URL to make the request to.
+    url: "https://staging-api.look-see.com/chrome",
+
+    // The 'contentType' property sets the 'Content-Type' header.
+    // The JQuery default for this property is
+    // 'application/x-www-form-urlencoded; charset=UTF-8', which does not trigger
+    // a preflight. If you set this value to anything other than
+    // application/x-www-form-urlencoded, multipart/form-data, or text/plain,
+    // you will trigger a preflight request.
+    contentType: "application/json",
+    data: JSON.stringify({key: key, domain_url: start_url, name: test_name, path: path}),
+    xhrFields: {
+      // The 'xhrFields' property sets additional fields on the XMLHttpRequest.
+      // This can be used to set the 'withCredentials' property.
+      // Set the value to 'true' if you'd like to pass cookies to the server.
+      // If this is enabled, your server must respond with the header
+      // 'Access-Control-Allow-Credentials: true'.
+      withCredentials: true
+    },
+    headers: {
+    },
+    beforeSend: function(xhr, settings) {
+      xhr.setRequestHeader("Authorization","Bearer " + auth.access_token);
+    },
+    success: function(response) {
+      $jquery("#exportIssues").prop("disabled",false);
+      $jquery("#export_test_btn_text").show();
+      $jquery("#export_test_btn_waiting_txt").hide();
+      $jquery("#export_test_success_text").show(0).delay(20000).hide(0);
+
+      chrome.runtime.sendMessage({msg: "show-test-saved-msg"}, function(response) {});
+    },
+
+    error: function(response) {
+      $jquery("#exportIssues").prop("disabled",false);
+
+      $jquery("#export_test_btn_text").show();
+      $jquery("#export_test_btn_waiting_txt").hide();
+      if(response.status === 0){
+        $jquery("#export-404-error").show(0).delay(20000).hide(0);
+      }else{
+        $jquery("#export-error").show(0).delay(20000).hide(0);
+      }
+
+      // Here's where you handle an error response.
+      // Note that if the error was due to a CORS issue,
+      // this function will still fire, but there won't be any additional
+      // information about the error.
+      // Trigger desktop notification that test was saved successfully
+      var options = {
+        type: "basic",
+        title: "Save failed",
+        message: "Unable to save test. Please try again.",
+        iconUrl: "images/qanairy_q_logo_black_48.png",
+        isClickable: true
+      }
+
+      chrome.notifications.create("test-save-failed", options, function(id) {});
+    }
+  });
+});
+
+
+
+
+/*********************************************************
+ * 
+ * OLD QANAIRY CODE. DELETE IF STILL HERE AFTER 8-1-2022
+ * 
+ *********************************************************/
 $jquery("#actionValueContainer").hide();
 $jquery("#export-error").hide();
 $jquery("#export-404-error").hide(0);
@@ -16,15 +277,7 @@ let pageEditPanel = document.getElementById("pageForm");
 let pageElementEditPanel = document.getElementById("pageElementForm");
 let selector_status = "disabled";
 
-let close_ide = function(){
-  //hide parent element
-  var looksee_ide = document.getElementById("looksee_ide");
-  looksee_ide.style.display = "none";
 
-  //reset localStorage
-  localStorage.removeItem("path");
-  localStorage.removeItem("status");
-}
 
 /*
  * Shows page creation form when button is clicked
@@ -373,7 +626,7 @@ $jquery("#exportTest").on("click", function(element){
       type: "POST",
 
       // The URL to make the request to.
-      url: "https://staging-api.qanairy.com/testIDE",
+      url: "https://staging-api.look-see.com/chrome",
 
       // The 'contentType' property sets the 'Content-Type' header.
       // The JQuery default for this property is
