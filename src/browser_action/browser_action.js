@@ -8,6 +8,7 @@ function isLoggedIn(token) {
 }
 
 function showOpenRecorder() {
+  console.log("opening recorder...")
   $("#open-recorder").classList.remove("hidden");
   $("#close-recorder").classList.add("hidden");
 
@@ -41,15 +42,17 @@ function renderProfileView(authResult) {
   }).catch(logout);
 }
 
-
+/**
+ * Renders default action view
+ */
 function renderDefaultView() {
-  $(".default").classList.remove("hidden");
-  $(".profile").classList.add("hidden");
+  $(".default").classList.add("hidden");
+  $(".profile").classList.remove("hidden");
 
   $(".login-button").addEventListener("click", () => {
     $(".default").classList.add("hidden");
     chrome.runtime.sendMessage({
-      type: "authenticate"
+      type: "open"
     });
   });
 }

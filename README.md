@@ -22,7 +22,7 @@ In order to work on this project you will need Git. If you prefer to use a user 
 
 #### Command Line
 
-Clone the Qanairy IDE repository using git
+Clone the Look-see Chrome Extension repository using git
 
 ```Shell
 git clone https://github.com/deepthought42/LookseeChromeExtension.git

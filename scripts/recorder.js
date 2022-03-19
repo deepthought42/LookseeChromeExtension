@@ -244,7 +244,7 @@ $jquery("#exportIssue").on("click", function(element){
         type: "basic",
         title: "Save failed",
         message: "Unable to save test. Please try again.",
-        iconUrl: "images/qanairy_q_logo_black_48.png",
+        iconUrl: "images/Red_48.png",
         isClickable: true
       }
 
@@ -678,7 +678,7 @@ $jquery("#exportTest").on("click", function(element){
           type: "basic",
           title: "Save failed",
           message: "Unable to save test. Please try again.",
-          iconUrl: "images/qanairy_q_logo_black_48.png",
+          iconUrl: "images/Red_48.png",
           isClickable: true
         }
 

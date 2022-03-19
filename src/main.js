@@ -37,7 +37,7 @@ var subscribe = function(channel_name){
       type: "basic",
       title: "Test Created",
       message: test.name + " was created successfully",
-      iconUrl: "images/qanairy_q_logo_black_48.png",
+      iconUrl: "images/Red_48.png",
       isClickable: true
     }
 
@@ -47,6 +47,11 @@ var subscribe = function(channel_name){
 };
 
 chrome.runtime.onMessage.addListener(function (event) {
+  if (event.type === "open"){
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs){
+      chrome.tabs.sendMessage(tabs[0].id, {action: "open_dialog_box", msg: "open_recorder"}, function(response) {});
+    });
+  }
   if (event.type === "start_recording"){
     localStorage.status = "recording";
     chrome.webNavigation.onCompleted.addListener(
@@ -102,7 +107,7 @@ chrome.runtime.onMessage.addListener(function (event) {
     let options = {
       responseType: "token id_token",
       scope: "openid profile offline_access",
-      audience: "https://staging-api.qanairy.com",
+      audience: env.API_URL,
       device: "chrome-extension"
     };
     new Auth0Chrome(env.AUTH0_DOMAIN, env.AUTH0_CLIENT_ID)
@@ -111,7 +116,7 @@ chrome.runtime.onMessage.addListener(function (event) {
         localStorage.authResult = JSON.stringify(authResult);
         chrome.notifications.create({
           type: "basic",
-          iconUrl: "images/qanairy_q_logo_white.png",
+          iconUrl: "images/Red.png",
           title: "Login Successful",
           message: "You can record tests now"
         });
@@ -124,7 +129,7 @@ chrome.runtime.onMessage.addListener(function (event) {
           type: "basic",
           title: "Login Failed",
           message: err.message,
-          iconUrl: "images/qanairy_q_logo_white.png"
+          iconUrl: "images/Red.png"
         });
       });
   }
@@ -146,7 +151,7 @@ chrome.runtime.onMessage.addListener(function (event) {
         type: "basic",
         title: "Test Opened",
         message: "This test can now be edited",
-        iconUrl: "images/qanairy_q_logo_black_48.png",
+        iconUrl: "images/Red_48.png",
         isClickable: true
       };
 
@@ -164,7 +169,7 @@ chrome.runtime.onMessage.addListener(function (event) {
       type: "basic",
       title: "Your test is being processed",
       message: "Qanairy is building your test. We'll let you know when it's ready.",
-      iconUrl: "images/qanairy_q_logo_black_48.png",
+      iconUrl: "images/Red_48.png",
       isClickable: true
     };
 

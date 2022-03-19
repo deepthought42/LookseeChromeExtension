@@ -16,8 +16,8 @@
 
 			#mainPopup {
 				padding: 10px;
-				width: 320px;
-				min-height: 100px;
+				width: 400px;
+				min-height: 300px;
 				font-family: Helvetica, Ubuntu, Arial, sans-serif;
 			}
 
@@ -134,17 +134,87 @@
 	<body>
 		<div id="mainPopup">
 
-			<div class="profile hidden">
-				<div>
-					<button id="open-recorder" class="btn">
-						Open Recorder
-					</button>
-					<button id="close-recorder" class="btn btn-danger">
-						Close Recorder
-					</button>
+			<div class="profile hidden container-fluid">
+				<div class="row spacer" >
+				</div>
+				<div class="row">
+				  <!-- text color palette box-->
+				  <div class="col-xs-3">
+					 <div class="text-center">
+						Text
+					 </div>
+					 <div>
+						<div id="text_color">
+		  
+						</div>
+					 </div>
+					 <div id="text_hex_color">
+						
+					 </div>
+				  </div>
+		  
+				  <!-- bg color palette box-->
+				  <div class="col-xs-3">
+					 <div>
+						Background
+					 </div>
+					 <div>
+						<div id="bg_color">
+		  
+						</div>
+					 </div>
+					 <div id="bg_hex_color">
+						
+					 </div>
+				  </div>
+		  
+				  <!-- Contrast and compliance section -->
+				  <div class="col-xs-6 container-fluid">
+					 <div class="">
+						<div>
+						  Contrast
+						</div>
+						<div id="contrast">
+						  
+						</div>
+					 </div>
+					 <div class="aa_compliance">
+						<div id="contrast">
+						  <img id="aa_success" src=""/>
+						  <img id="aa_fail" src=""/>
+						</div>
+						<div>
+						  AA - <span id="aa_small_text">4.5:1</span><span id="aa_large_text">3:1</span>
+						</div>
+					 </div>
+					 <div class="">
+						<div id="aaa_compliance">
+						  <img id="aaa_success" src=""/>
+						  <img id="aaa_fail" src=""/>
+						</div>
+						<div>
+						  AAA - <span id="aaa_small_text">7:1</span><span id="aaa_large_text">7:1</span>
+						</div>
+					 </div>
+				  </div>
+				</div>
+		  
+				<div  id="test_path_viewer" class="path-container">
+				  <!-- path element list populates here -->
+				</div>
+		  
+				<div class="row spacer">
+				</div>
+				<div class="col-xs-12">
+				  <div id="export-404-error" style="color:red">
+					 Look-see servers are currently unresponsive. Please try again in a few minutes.
+				  </div>
+				  <div id="export-error" style="color:red">
+					 An error occurred while exporting your issues. Please try again.
+				  </div>
 				</div>
 
-				<div class="floater-profile">
+				<div class="floater-profile hidden">
 					<div class="floater-background"></div>
 					<hr />
 					<div>
@@ -154,7 +224,7 @@
 			</div>
 			<div class="default">
 				<div class="text-center">
-					<h3>Welcome to the Qanairy Recorder</h1>
+					<h3>Welcome to Look-see</h1>
 					<button class="btn btn-success login-button">Log In</button>
 					<p class="caption">Please login to get started.</p>
 				</div>
