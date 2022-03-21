@@ -340,7 +340,7 @@ let generatePageElementPathListItem = function(path_element, index){
  */
 let redrawPathElement = function(element, index){
   var list_item_html = generatePageElementPathListItem(element, index);
-  $jquery("#test_path_viewer").children().eq(index).html(list_item_html);
+  $jquery("#contrast_issues").children().eq(index).html(list_item_html);
 }
 
 /*
@@ -357,7 +357,7 @@ let redrawPath = function(path){
       list_html += generatePageElementPathListItem(element, idx);
     }
   }
-  $jquery("#test_path_viewer").html(list_html);
+  $jquery("#contrast_issues").html(list_html);
 }
 
 /*
@@ -403,10 +403,10 @@ $jquery("#createNewTest").on("click", function(){
   localStorage.setItem("path", JSON.stringify([]));
   localStorage.removeItem("test");
 
-  $jquery("#test_path_viewer").html("");
+  $jquery("#contrast_issues").html("");
 });
 
-$jquery("#test_path_viewer").on("click", ".delete-icon", function(e){
+$jquery("#contrast_issues").on("click", ".delete-icon", function(e){
   var path = JSON.parse(localStorage.getItem("path"));
   var confirmed = confirm("Are you sure you want to delete this step?");
   var index = $jquery(this).parent().parent().data("index");
@@ -497,7 +497,7 @@ $jquery("#savePageButton").on("click", function(){
 
 //clicking on the edit icon(pencil) loads the path element info into the appropriate
 // edit panel
-$jquery("#test_path_viewer").on("click", ".edit-icon", function(e){
+$jquery("#contrast_issues").on("click", ".edit-icon", function(e){
     //send element to path element form
     var index = $jquery(this).parent().parent().data("index");
     $jquery("#pageIndexInPath").val(index);
@@ -714,7 +714,7 @@ chrome.runtime.onMessage.addListener(
           if(path.length === 0){
             //push page into path
             path.push({url : request.data.url});
-            $jquery("#test_path_viewer").append( generatePagePathListItem(request.data, path.length-1 ));
+            $jquery("#contrast_issues").append( generatePagePathListItem(request.data, path.length-1 ));
           }
 
           //check if last element is equal to this element

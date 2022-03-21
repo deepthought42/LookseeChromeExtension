@@ -5,6 +5,7 @@
   "main": "background.js",
   "dependencies": {
     "auth0-chrome": "^0.1.0",
+    "jsdom": "^19.0.0",
     "jwt-decode": "^2.1.0"
   },
   "devDependencies": {},

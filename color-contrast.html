@@ -1,0 +1,92 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="styles/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/fontawesome.min.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/regular.min.css">
+    <link rel="stylesheet" href="styles/solid.min.css">
+  </head>
+  <body id="looksee-ide">
+    <div class="spacer" >
+    </div>
+    
+    <div id="analysis_container">
+      <div class="flex items-center justify-center">
+        <button class="btn" id="analyzeButton">Analyze Page</button>
+      </div>
+    </div>
+
+    <div  id="contrast_issues" class="path-container">
+      <!-- path element list populates here -->
+    </div>
+
+    <div class="contrast_details">
+      <!-- text color palette box-->
+      <div class="col-xs-2">
+        <div class="flex justify-center items-center">
+          Text
+        </div>
+        <div class="color_container flex items-center justify-center">
+          <div id="text_color" class="border color_box">
+
+          </div>
+        </div>
+        <div id="text_hex_color" class="flex items-center justify-center">
+          #6649e4
+        </div>
+      </div>
+
+      <!-- bg color palette box-->
+      <div class="col-xs-3">
+        <div class="flex justify-center items-center">
+          Background
+        </div>
+        <div class="color_container flex items-center justify-center">
+          <div id="bg_color" class="border color_box">
+
+          </div>
+        </div>
+        <div id="bg_hex_color" class="flex items-center justify-center">
+          #6649e4
+        </div>
+      </div>
+
+      <!-- Contrast and compliance section -->
+      <div class="col-xs-3 container-fluid">
+        <div class="flex items-center justify-center">
+          Contrast
+        </div>
+        <div id="contrast" class="text-xl flex items-center justify-center">
+          3.5
+        </div>
+      </div>
+      <div class="col-xs-4 container-fluid">
+        <div class="row">
+          <div id="contrast">
+            <img id="aaa_success" src=""/>
+            <img id="aaa_fail" src=""/>
+          </div>
+          <div class="">
+            <span class="text-lg">AA </span>- <span id="aa_small_text">4.5:1</span><span id="aa_large_text">3:1</span>
+          </div>
+        </div>
+        <div class="row">
+          <div id="contrast">
+            <img id="aaa_success" src=""/>
+            <img id="aaa_fail" src=""/>
+          </div>
+          <div >
+            <span class="text-lg">AAA </span>- <span id="aaa_small_text">4.5:1</span><span id="aaa_large_text">7:1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="scripts/jquery.js"></script>
+  <script src="scripts/fontawesome.min.js"></script>
+  <script src="scripts/regular.min.js"></script>
+  <script src="scripts/solid.min.js"></script>
+  <script src="scripts/bootstrap.min.js"></script>
+  <script src="scripts/jwt-decode.min.js"></script>
+  <script src="scripts/color-contrast.js"></script>
+</html>
