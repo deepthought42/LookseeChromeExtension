@@ -16,11 +16,20 @@
       </div>
     </div>
 
+    <div id="issues_header" class="flex flex-row">
+      <div class="flex justify-center items-center w-30percent">Type</div>
+      <div class="flex justify-center items-center w-60percent">Contrast</div>
+    </div>
+
     <div  id="contrast_issues" class="path-container">
       <!-- path element list populates here -->
     </div>
 
-    <div class="contrast_details">
+    <section id="empty_contrast_compliance" class="flex items-center justify-center">
+      Click on a contrast issue above to see results
+    </section>
+
+    <section class="contrast_details" id="contrast_compliance_section">
       <!-- text color palette box-->
       <div class="col-xs-2">
         <div class="flex justify-center items-center">
@@ -52,7 +61,7 @@
       </div>
 
       <!-- Contrast and compliance section -->
-      <div class="col-xs-3 container-fluid">
+      <div class="col-xs-3">
         <div class="flex items-center justify-center">
           Contrast
         </div>
@@ -60,27 +69,28 @@
           3.5
         </div>
       </div>
-      <div class="col-xs-4 container-fluid">
+      
+      <div class="col-xs-4">
         <div class="row">
-          <div id="contrast">
-            <img id="aaa_success" src=""/>
-            <img id="aaa_fail" src=""/>
+          <div id="aa_complaince">
+            <img id="aa_success" src=""/>
+            <img id="aa_fail" src=""/>
           </div>
           <div class="">
-            <span class="text-lg">AA </span>- <span id="aa_small_text">4.5:1</span><span id="aa_large_text">3:1</span>
+            <span class="text-lg">AA </span>- <span id="aa_non_text">4.5:1</span><span id="aa_small_text">4.5:1</span><span id="aa_large_text">3:1</span>
           </div>
         </div>
         <div class="row">
-          <div id="contrast">
+          <div id="aaa_compliance">
             <img id="aaa_success" src=""/>
             <img id="aaa_fail" src=""/>
           </div>
           <div >
-            <span class="text-lg">AAA </span>- <span id="aaa_small_text">4.5:1</span><span id="aaa_large_text">7:1</span>
+            <span class="text-lg">AAA </span>- <span id="aaa_non_text">7:1</span><span id="aaa_small_text">4.5:1</span><span id="aaa_large_text">7:1</span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </body>
   <script src="scripts/jquery.js"></script>
   <script src="scripts/fontawesome.min.js"></script>

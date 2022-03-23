@@ -1,5 +1,91 @@
 const $  = document.querySelector.bind(document);
 
+var issue_list = [];
+
+/**
+ * Sets the values for the given issue
+ * 
+ * @param {*} issue 
+ */
+function showContrastDetails(event){
+  $('#empty_contrast_compliance').style.display = "none";
+  $('#contrast_compliance_section').style.display = "initial";
+
+  const index = [...this.parentElement.children].indexOf(this)
+  let issue = issue_list[index];
+  console.log("index :: "+index);
+  $("#text_color").style.backgroundColor = issue.foreground_color;
+  $("#text_hex_color").textContent = issue.foreground_color
+
+  $("#bg_color").style.backgroundColor = issue.background_color;
+  $("#bg_hex_color").textContent = issue.background_color
+
+  $("#contrast").textContent = issue.contrast;
+
+  if(issue.type.toLowerCase() === "small text"){
+    $('#aa_small_text').style.display = "initial";
+    $('#aaa_small_text').style.display = "initial";
+
+    $('#aa_large_text').style.display = "none";
+    $('#aaa_large_text').style.display = "none";
+    $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "none";
+    $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
+  }
+  else if(issue.type.toLowerCase() === "large text"){
+    $('#aa_large_text').style.display = "initial";
+    $('#aaa_large_text').style.display = "initial";
+
+    $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "none";
+    $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "none";
+
+    $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "none";
+    $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
+  }
+  else if(issue.type.toLowerCase() === "button"){
+    $('#aa_non_text').style.display = "initial";
+    $('#aaa_non_text').style.display = "initial";
+
+    $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "none";
+    $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "none";
+    $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "none";
+    $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "none";
+    
+    $('#aa_small_text').style.display = "none";
+    $('#aaa_small_text').style.display = "none";
+  }
+}
+
+/**
+ * Constructs HTML to display the given issue as a row
+ * 
+ * @param {*} issue 
+ * @returns 
+ */
+function constructContrastIssueHtml(issue){
+  console.log("ISSUE :: "+JSON.stringify(issue))
+  console.log("contrast :: "+issue.contrast)
+  return "<div class='issue_row flex flex-row'>"
+          + "<div class='w-30percent flex items-center text-md pl-16'>"+ issue.type +"</div>"
+          + "<div class='w-60percent flex items-center justify-center text-md'>"+issue.contrast + "</div>"
+          + "<input type='hidden' val='"+ issue.element_ref +"'></div>";
+}
+
+function buildContrastIssuesList(contrast_issues){
+  let issue_html = "";
+  if(contrast_issues === undefined){
+    return "";
+  }
+
+  contrast_issues.forEach(issue => {
+    console.log("ISSUE 0 :: "+JSON.stringify(issue))
+
+    issue_html += constructContrastIssueHtml(issue);
+
+  });
+
+  return issue_html;
+}
+
 function analyzeContrast() {  
   
   console.log("sending message to color contrast");
@@ -7,10 +93,14 @@ function analyzeContrast() {
 
     chrome.tabs.sendMessage(tabs[0].id, { method: "analyzeContrast", data: "xxx" },
       function (res) {
-        console.log("sending message to color contrast "+res);
+        console.log("sending message to color contrast "+JSON.stringify(res));
+        issue_list = res;
+        $("#contrast_issues").innerHTML = buildContrastIssuesList(res);
 
-        //document.getElementById("popupElement1").innerText = res.method;
-        //document.getElementById("popupElement2").innerText = res.data;
+        const issues = document.querySelectorAll('.issue_row');
+        issues.forEach(issue => {
+          issue.addEventListener('click', showContrastDetails);
+        });
         
         /* handle the response from background here */
         if (!window.chrome.runtime.lastError) {

@@ -13,7 +13,7 @@ body {
 }
 
 #contrast {
-  height: 80%;
+  height: 80px;
 }
 
 .border {
@@ -38,6 +38,10 @@ body {
   display: flex;
 }
 
+.flex-row{
+  flex-direction: row;
+}
+
 .justify-center {
   justify-content: center;
 }
@@ -52,6 +56,10 @@ body {
 }
 
 /** TEXT SIZES */
+
+.text-md {
+  font-size: medium;
+}
 
 .text-lg {
   font-size: large;
@@ -68,6 +76,39 @@ body {
 .fail {
   color: blue;
 }
+
+
+/* ISSUE ROW STYLES */
+
+#contrast_issues > div:nth-child(even) {
+  background-color: #EEE !important
+}
+#contrast_issues > div:nth-child(odd) {
+  background-color: #FFF !important
+}
+
+.issue_row {
+  width: 100%;
+  height: 40px;
+}
+
+.issue_row:hover {
+  cursor: pointer;
+}
+
+.w-30percent {
+  position: relative;
+  width: 30%;
+  height: 100%;
+}
+
+.w-60percent {
+  position: relative;
+  width: 60%;
+  height: 100%;
+}
+
+/* BUTTON STYLING */
 
 .btn {
   color: #ffffff;
@@ -96,9 +137,23 @@ body {
   font-size: 0.8em !important;
 }
 
+/* PADDING */
+.pl-8 {
+  padding-left: 8px;
+}
+
+.pl-16 {
+  padding-left: 16px;
+}
+
 .row {
   padding: 0px;
   margin: 0px;
+}
+
+/* Compliance sections */
+#contrast_compliance_section {
+  display: none;
 }
 
 .col-xs-12 {
@@ -115,7 +170,7 @@ body {
 
 .contrast_details {
   width: 100%;
-  height: 20%;
+  height: 200px;
   min-height: 100px;
   padding-top: 36px;
 }
