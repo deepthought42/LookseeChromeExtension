@@ -8,11 +8,25 @@ var issue_list = [];
  * @param {*} issue 
  */
 function showContrastDetails(event){
+
   $('#empty_contrast_compliance').style.display = "none";
   $('#contrast_compliance_section').style.display = "initial";
 
   const index = [...this.parentElement.children].indexOf(this)
   let issue = issue_list[index];
+
+  //send message to content script with issue element_ref
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+
+    chrome.tabs.sendMessage(tabs[0].id, { method: "viewIssue", data: issue.element_ref },
+      function (res) {
+        console.log("issue.element_ref = "+issue.element_ref);
+        return;
+      }
+    )
+  });
+
+
   console.log("index :: "+index);
   $("#text_color").style.backgroundColor = issue.foreground_color;
   $("#text_hex_color").textContent = issue.foreground_color
@@ -23,6 +37,9 @@ function showContrastDetails(event){
   $("#contrast").textContent = issue.contrast;
 
   if(issue.type.toLowerCase() === "small text"){
+    $('#non_text_element_label').style.display = "none";
+    $('#text_element_label').style.display = "initial";
+    
     $('#aa_small_text').style.display = "initial";
     $('#aaa_small_text').style.display = "initial";
 
@@ -32,6 +49,9 @@ function showContrastDetails(event){
     $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
   }
   else if(issue.type.toLowerCase() === "large text"){
+    $('#non_text_element_label').style.display = "none";
+    $('#text_element_label').style.display = "initial";
+
     $('#aa_large_text').style.display = "initial";
     $('#aaa_large_text').style.display = "initial";
 
@@ -41,7 +61,10 @@ function showContrastDetails(event){
     $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "none";
     $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
   }
-  else if(issue.type.toLowerCase() === "button"){
+  else if(issue.type.toLowerCase() === "non-text"){
+    $('#non_text_element_label').style.display = "initial";
+    $('#text_element_label').style.display = "none";
+
     $('#aa_non_text').style.display = "initial";
     $('#aaa_non_text').style.display = "initial";
 

@@ -27,11 +27,11 @@ body {
 }
 
 #text_color {
-  background-color: #6649e4;
+  background-color: #FFFFFF;
 }
 
 #bg_color {
-  background-color: #ffdc05;
+  background-color: #FFFFFF;
 }
 
 .flex {
@@ -40,6 +40,10 @@ body {
 
 .flex-row{
   flex-direction: row;
+}
+
+.flex-col{
+  flex-direction: column;
 }
 
 .justify-center {
@@ -56,6 +60,9 @@ body {
 }
 
 /** TEXT SIZES */
+.text-sm {
+  font-size: small;
+}
 
 .text-md {
   font-size: medium;
@@ -70,11 +77,11 @@ body {
 }
 
 .success {
-  color: green;
+  color: #23D8A4;
 }
 
 .fail {
-  color: blue;
+  color: #39B7FF;
 }
 
 
@@ -112,24 +119,24 @@ body {
 
 .btn {
   color: #ffffff;
-  background-color: #6649e4;
+  background-color: #FF0050;
 }
 
 .btn:focus,
 .btn.focus {
   color: #fff !important;
-  background-color: #553fc0;
+  background-color: #FF0050;
 }
 
 .btn:hover {
   color: #fff !important;
-  background-color: #553fc0;
+  background-color: #FF0050;
 }
 
 .btn:active,
 .btn.active {
   color: #fff !important;
-  background-color: #553fc0;
+  background-color: #FF0050;
 }
 
 .btn-sm {
@@ -149,6 +156,10 @@ body {
 .row {
   padding: 0px;
   margin: 0px;
+}
+
+.w-full {
+  width: 100%;
 }
 
 /* Compliance sections */
@@ -191,11 +202,6 @@ body {
   font-size: 0.8em !important;
 }
 
-.spacer {
-  height: 15px;
-}
-
-
 .path-element-value {
   padding: 0px 0px 0px 5px;
   word-wrap: break-word;
@@ -207,10 +213,6 @@ body {
 
 .icons .icon {
   padding: 0px 3px;
-}
-
-.delete-icon {
-  color: red;
 }
 
 .col-xs-10 {
