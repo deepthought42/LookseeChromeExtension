@@ -1,13 +1,19 @@
+//const { active } = require("auth0-chrome");
 const $  = document.querySelector.bind(document);
 
 var issue_list = [];
-
+var active_element = null;
 /**
  * Sets the values for the given issue
  * 
  * @param {*} issue 
  */
 function showContrastDetails(event){
+  if(active_element != null){
+    active_element.classList.remove("active_issue");
+  }
+  active_element = this;
+  active_element.classList.add("active_issue");
 
   $('#empty_contrast_compliance').style.display = "none";
   $('#contrast_compliance_section').style.display = "initial";
@@ -27,7 +33,6 @@ function showContrastDetails(event){
   });
 
 
-  console.log("index :: "+index);
   $("#text_color").style.backgroundColor = issue.foreground_color;
   $("#text_hex_color").textContent = issue.foreground_color
 
@@ -35,6 +40,24 @@ function showContrastDetails(event){
   $("#bg_hex_color").textContent = issue.background_color
 
   $("#contrast").textContent = issue.contrast;
+
+  if(issue.is_aa_compliant){
+    $("#aa_success").style.display = "initial";
+    $("#aa_fail").style.display = "none";
+  }
+  else {
+    $("#aa_success").style.display = "none";
+    $("#aa_fail").style.display = "initial";
+  }
+
+  if(issue.is_aaa_compliant){
+    $("#aaa_success").style.display = "initial";
+    $("#aaa_fail").style.display = "none";
+  }
+  else {
+    $("#aaa_success").style.display = "none";
+    $("#aaa_fail").style.display = "initial";
+  }
 
   if(issue.type.toLowerCase() === "small text"){
     $('#non_text_element_label').style.display = "none";

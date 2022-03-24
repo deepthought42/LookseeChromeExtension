@@ -86,12 +86,15 @@ body {
 
 
 /* ISSUE ROW STYLES */
-
 #contrast_issues > div:nth-child(even) {
-  background-color: #EEE !important
+  background-color: #f0f0f0
 }
 #contrast_issues > div:nth-child(odd) {
-  background-color: #FFF !important
+  background-color: #FFF
+}
+
+.active_issue {
+  background-color: #f9e4e8 !important;
 }
 
 .issue_row {
@@ -113,6 +116,19 @@ body {
   position: relative;
   width: 60%;
   height: 100%;
+}
+
+.h-100 {
+  height: 100px;
+}
+
+/** SUCCESS / ERROR */
+.success {
+  color: #23D8A4;
+}
+
+.error {
+  color: red;
 }
 
 /* BUTTON STYLING */
@@ -207,6 +223,11 @@ body {
   word-wrap: break-word;
 }
 
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
 .icons {
   padding: 0px 0px;
 }
@@ -216,6 +237,10 @@ body {
 }
 
 .col-xs-10 {
+  padding: 0px !important;
+}
+
+.col-xs-3 {
   padding: 0px !important;
 }
 

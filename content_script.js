@@ -380,10 +380,14 @@ function findParentWithDifferentBackground(element){
   var parent = element.parentElement;
   var element_bg_color = getComputedStyle(element).backgroundColor;
   while(parent != undefined && parent != null){
-    if((getComputedStyle(parent).backgroundColor != element_bg_color && getComputedStyle(parent) != "rgba(0, 0, 0, 0)")){
+    if((getComputedStyle(parent).backgroundColor != element_bg_color && getComputedStyle(parent).backgroundColor != "rgba(0, 0, 0, 0)")){
       return getComputedStyle(parent).backgroundColor;
     }
     parent = parent.parentElement;
+  }
+
+  if(getComputedStyle(parent).backgroundColor == "rgba(0, 0, 0, 0)"){
+    return "rgb(255, 255, 255)";
   }
 
   return getComputedStyle(parent).backgroundColor;
