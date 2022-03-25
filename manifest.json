@@ -5,7 +5,8 @@
   "description": "Look-see helps you find and fix accessibility issues",
   "homepage_url": "https://look-see.com/",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "action": {},
   "background": {
