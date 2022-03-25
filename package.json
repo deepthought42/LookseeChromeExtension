@@ -1,6 +1,6 @@
 {
   "name": "look-see",
-  "version": "0.1.0",
+  "version": "0.1",
   "description": "Look-see helps find and fix accessibility issues",
   "main": "background.js",
   "dependencies": {

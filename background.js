@@ -9,12 +9,38 @@ console.log(env)
 
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
-        "id": "sampleContextMenu",
-        "title": "Sample Context Menu",
+        "id": "LookseeMenu",
+        "title": "Look-see",
         "contexts": ["selection"]
     });
 });
 
+chrome.action.onClicked.addListener(function(tab) {
+  chrome.windows.create({
+    url: chrome.runtime.getURL("color-contrast.html"),
+    type: "popup",
+    height: 700,
+    width: 400
+  });
+});
+
+/*
+chrome.app.runtime.onLaunched.addListener(function() {
+  chrome.app.window.create("color-contrast.html",
+    {  frame: "none",
+       id: "LookseeExtension",
+       innerBounds: {
+         width: 360,
+         height: 300,
+         left: 600,
+         minWidth: 220,
+         minHeight: 220
+      }
+    }
+  );
+})
+*/
+/*
 chrome.action.onClicked.addListener(tab => {
   console.log("background received message :: "+request);
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -25,6 +51,7 @@ chrome.action.onClicked.addListener(tab => {
     });
   });
 });
+*/
 
 /*
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

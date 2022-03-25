@@ -300,7 +300,7 @@ function getIsAAACompliant(contrast, font_size, font_weight){
  * @param {*} font_weight 
  */
 function getIsNonTextAAACompliant(contrast){
-  if(contrast >= 4.5){
+  if(contrast >= 3.0){
     return true;
   }
 
@@ -386,11 +386,11 @@ function findParentWithDifferentBackground(element){
     parent = parent.parentElement;
   }
 
-  if(getComputedStyle(parent).backgroundColor == "rgba(0, 0, 0, 0)"){
+  if(getComputedStyle(element).backgroundColor == "rgba(0, 0, 0, 0)"){
     return "rgb(255, 255, 255)";
   }
 
-  return getComputedStyle(parent).backgroundColor;
+  return getComputedStyle(element).backgroundColor;
 }
 
 /**

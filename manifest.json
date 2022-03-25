@@ -15,10 +15,7 @@
     "scripting"
   ],
   "host_permissions": ["http://*/*", "https://*/*"],
-  "action": {
-      "default_title": "Look-see",
-      "default_popup": "color-contrast.html"
-  },
+  "action": {},
   "background": {
     "service_worker": "background.js"
   },

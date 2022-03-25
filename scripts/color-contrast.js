@@ -22,11 +22,10 @@ function showContrastDetails(event){
   let issue = issue_list[index];
 
   //send message to content script with issue element_ref
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
 
     chrome.tabs.sendMessage(tabs[0].id, { method: "viewIssue", data: issue.element_ref },
       function (res) {
-        console.log("issue.element_ref = "+issue.element_ref);
         return;
       }
     )
@@ -60,23 +59,24 @@ function showContrastDetails(event){
   }
 
   if(issue.type.toLowerCase() === "small text"){
-    $('#non_text_element_label').style.display = "none";
-    $('#text_element_label').style.display = "initial";
+    $('#non_text_element_label') == null ? "" : $('#non_text_element_label').style.display = "none";
+    $('#text_element_label') == null ? "" : $('#text_element_label').style.display = "initial";
     
-    $('#aa_small_text').style.display = "initial";
-    $('#aaa_small_text').style.display = "initial";
+    $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "initial";
+    $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "initial";
 
-    $('#aa_large_text').style.display = "none";
-    $('#aaa_large_text').style.display = "none";
+    $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "none";
+    $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "none";
+    
     $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "none";
     $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
   }
   else if(issue.type.toLowerCase() === "large text"){
-    $('#non_text_element_label').style.display = "none";
-    $('#text_element_label').style.display = "initial";
+    $('#non_text_element_label') == null ? "" : $('#non_text_element_label').style.display = "none";
+    $('#text_element_label') == null ? "" : $('#text_element_label').style.display = "initial";
 
-    $('#aa_large_text').style.display = "initial";
-    $('#aaa_large_text').style.display = "initial";
+    $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "initial";
+    $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "initial";
 
     $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "none";
     $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "none";
@@ -85,11 +85,11 @@ function showContrastDetails(event){
     $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
   }
   else if(issue.type.toLowerCase() === "non-text"){
-    $('#non_text_element_label').style.display = "initial";
-    $('#text_element_label').style.display = "none";
+    $('#non_text_element_label') == null ? "" : $('#non_text_element_label').style.display = "initial";
+    $('#text_element_label') == null ? "" : $('#text_element_label').style.display = "none";
 
-    $('#aa_non_text').style.display = "initial";
-    $('#aaa_non_text').style.display = "initial";
+    $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "initial";
+    $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "initial";
 
     $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "none";
     $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "none";
@@ -108,8 +108,6 @@ function showContrastDetails(event){
  * @returns 
  */
 function constructContrastIssueHtml(issue){
-  console.log("ISSUE :: "+JSON.stringify(issue))
-  console.log("contrast :: "+issue.contrast)
   return "<div class='issue_row flex flex-row'>"
           + "<div class='w-30percent flex items-center text-md pl-16'>"+ issue.type +"</div>"
           + "<div class='w-60percent flex items-center justify-center text-md'>"+issue.contrast + "</div>"
@@ -123,8 +121,6 @@ function buildContrastIssuesList(contrast_issues){
   }
 
   contrast_issues.forEach(issue => {
-    console.log("ISSUE 0 :: "+JSON.stringify(issue))
-
     issue_html += constructContrastIssueHtml(issue);
 
   });
@@ -132,14 +128,11 @@ function buildContrastIssuesList(contrast_issues){
   return issue_html;
 }
 
-function analyzeContrast() {  
-  
-  console.log("sending message to color contrast");
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+function analyzeContrast() {    
+  chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
 
     chrome.tabs.sendMessage(tabs[0].id, { method: "analyzeContrast", data: "xxx" },
       function (res) {
-        console.log("sending message to color contrast "+JSON.stringify(res));
         issue_list = res;
         $("#contrast_issues").innerHTML = buildContrastIssuesList(res);
 
