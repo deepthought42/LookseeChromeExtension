@@ -5,13 +5,7 @@
   "description": "Look-see helps you find and fix accessibility issues",
   "homepage_url": "https://look-see.com/",
   "permissions": [
-    "contextMenus",
-    "declarativeContent",
-    "storage",
-    "webNavigation",
     "activeTab",
-    "identity",
-    "notifications",
     "scripting"
   ],
   "host_permissions": ["http://*/*", "https://*/*"],

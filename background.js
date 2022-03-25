@@ -8,11 +8,7 @@ console.log(env)
 */
 
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
-        "id": "LookseeMenu",
-        "title": "Look-see",
-        "contexts": ["selection"]
-    });
+    
 });
 
 chrome.action.onClicked.addListener(function(tab) {
