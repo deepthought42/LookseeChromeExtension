@@ -1,12 +1,3 @@
-/*
-import env from "env.js"
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const dom = new JSDOM();
-
-console.log(env)
-*/
-
 chrome.runtime.onInstalled.addListener(() => {
     
 });
