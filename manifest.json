@@ -1,48 +1,27 @@
 {
-  "name": "Qanairy Recorder",
-    "version": "0.2",
-    "manifest_version": 2,
-    "description": "Allows recording custom tests for the Qanairy.com platform",
-    "homepage_url": "https://qanairy.com/",
-    "permissions": [
-      "declarativeContent",
-      "storage",
-      "webNavigation",
-      "tabs",
-      "activeTab",
-      "webRequestBlocking",
-      "identity",
-      "notifications",
-      "https://*.auth0.com/*",
-      "https://*/*"
-    ],
-    "browser_action": {
-        "default_title": "Qanairy Recorder",
-        "default_popup": "src/browser_action/browser_action.html"
-    },
-    "background": {
-      "scripts": [
-        "./env.js",
-        "node_modules/auth0-chrome/dist/auth0chrome.min.js",
-        "scripts/pusher.min.js",
-        "src/main.js"
-      ],
-      "persistent": false
-    },
-    "content_scripts": [
-        {
-          "matches": ["http://*/*", "https://*/*"],
-          "js": ["content_script.js"]
-        }
-    ],
-    "web_accessible_resources": [
-      "recorder.html"
-    ],
-    "icons": {
-      "16": "images/qanairy_q_logo_black_16.png",
-      "32": "images/qanairy_q_logo_black_32.png",
-      "48": "images/qanairy_q_logo_black_48.png",
-      "128": "images/qanairy_q_logo_black_128.png"
-    },
-    "content_security_policy": "script-src 'self' https://cdn.auth0.com/client/mMomHg1ZhzZkM4Tsz2NGkdJH3eeJqIq6.js; object-src 'self'"
+  "name": "Look-see",
+  "version": "0.1",
+  "manifest_version": 3,
+  "description": "Look-see helps you find and fix accessibility issues",
+  "homepage_url": "https://look-see.com/",
+  "permissions": [
+    "activeTab"
+  ],
+  "action": {},
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+      {
+        "matches": ["http://*/*", "https://*/*"],
+        "run_at": "document_end",
+        "js": ["content_script.js"]
+      }
+  ],
+  "icons": {
+    "16": "images/Red_16.png",
+    "32": "images/Red_32.png",
+    "48": "images/Red_48.png",
+    "128": "images/Red_128.png"
+  }
 }

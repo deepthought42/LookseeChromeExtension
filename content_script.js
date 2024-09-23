@@ -1,450 +1,480 @@
-//fire event to listen for url change events and action events
+const $  = document.querySelector.bind(document);
+var element_ref = null;
 
-let uppercase = false;
-let last_xpath = "";
-let last_node = null;
-let selector_enabled = false;
-
-
-let close_recorder = function(){
-  //hide parent element
-  document.getElementById("qanairy_ide").style.display = "none";
-  //reset localStorage
-  localStorage.clear();
-}
-
-let logout = function(){
-  localStorage.removeItem("authResult");
-  close_recorder;
-}
-
-let pause = function(milliseconds) {
-	var dt = new Date();
-	while ((new Date()) - dt <= milliseconds) { /* Do nothing */ }
-}
-
-let recorderKeyupListener = function(event){
-
-  chrome.runtime.sendMessage(
-    {
-      msg: "addToPath",
-      data: {
-        url: window.location.toString(),
-        pathElement: {
-          element: {
-            type: "pageElement",
-            target: event.relatedTarget,
-            xpath: last_xpath
-          },
-          action: {
-            type: "action",
-            name: "sendKeys",
-            value: last_node.value
-          }
-        }
-      }
-    },
-    function(response) {
-      //console.log("response ::  " +JSON.stringify(response));
-    }
-  );
-}
-
-let recorderKeydownListener = function(event){
-  //check if shift key
-  if(event.keyCode === 16){
-    uppercase = !uppercase;
-  }
-  //check for caps lock key
-  else if(event.keyCode === 20){
-    uppercase = !uppercase;
-  }
-}
-
-//generates x unique xpath for a given element
-let generateXpath = function(elem){
-
-  var xpath = "//"+elem.tagName.toLowerCase();
-  var attributes = ["id", "name", "class"];
-  var attributes_check = [];
-
-  for(var idx=0; idx< attributes.length; idx++){
-    if(elem.getAttribute(attributes[idx])){
-      attributes_check.push("contains(@"+attributes[idx] +",'"+elem.getAttribute(attributes[idx])+"')");
-    }
-  }
-
-  if(attributes_check.length > 0){
-    xpath += "[";
-    for(var idx1=0; idx1 < attributes_check.length; idx1++){
-      xpath += attributes_check[idx1];
-      if(idx1 < attributes_check.length-1){
-        xpath += " and ";
-      }
-    }
-    xpath += "]";
-  }
-
-  var elements = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-  var element = null;
-  var count = 1;
-  var indexed_xpath = "";
-  while(element = elements.iterateNext()){
-    if(element.tagName === elem.tagName
-        && element.text === elem.text
-        && element.innerHTML === elem.innerHTML){
-          indexed_xpath = "("+xpath+")[" + count + "]";
-          break;
-    }
-    count++;
-  }
-
-  if(count > 1){
-    xpath = indexed_xpath;
-  }
-
-  return xpath;
+/**
+ * converts value between 0 and 255 to hex value
+ */
+function componentToHex(c) {
+  const hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
 }
 
 /**
- * Traverses parent nodes in tree from current node toward root until it reaches the main html element or locates a z-Index value
+ * Converts rgb value to hex
+ * @param {} r 
+ * @param {*} g 
+ * @param {*} b 
+ * @returns 
  */
-let findParentZIndex = function(node){
-
-  var current_node = node;
-  var z_index = null;
-  while(current_node && (!z_index || !z_index.length || z_index === "auto")){
-    z_index = document.defaultView.getComputedStyle(current_node).getPropertyValue("z-index");
-    if(current_node.tagName === "HTML"){
-      if(z_index === "auto"){
-        return 0;
-      }
-    }
-
-    current_node = current_node.parentNode;
-  }
-
-  return z_index;
+function rgbToHex(rgb_string) {
+  var tmp_color_str = rgb_string.replace(")", "");
+  tmp_color_str = tmp_color_str.replace("rgba(", "");
+  tmp_color_str = tmp_color_str.replace("rgb(", "");
+  tmp_color_str = tmp_color_str.replaceAll(" ", "");
+  var rgb = tmp_color_str.split(",");
+  
+  var red = parseInt(rgb[0], 10);
+  var green = parseInt(rgb[1], 10);
+  var blue = parseInt(rgb[2], 10);
+  
+  return "#" + componentToHex(red) + componentToHex(green) + componentToHex(blue);
 }
 
-let recorderClickListener = function(event){
-
-  var xpath = "";
-  var possible_nodes = [];
-  var top_z_index = -10000;
-  //get all elements on page
-  document.querySelectorAll("body *").forEach(function(node){
-    if(node.id !== "qanairy_ide_frame" && node.id !== "qanairy_ide_header" && node.id !== "qanairy_ide_body" && node.id !== "qanairy_ide"){
-      var rect = node.getBoundingClientRect();
-      if(event.clientX >= rect.left && event.clientY >= rect.top && event.clientX <= rect.right && event.clientY <= rect.bottom){
-        possible_nodes.push(node);
-      }
-    }
-  });
-
-  for(var idx =0; idx < possible_nodes.length; idx++){
-    var node = possible_nodes[idx];
-    var rect = node.getBoundingClientRect();
-
-    if(last_node != null){
-      var z_index = findParentZIndex(possible_nodes[idx]);
-      var rect2 = last_node.getBoundingClientRect();
-      //smallest node
-      if((rect2.left <= rect.left || rect2.top <= rect.top || rect2.right >= rect.right || rect2.bottom >= rect.bottom) && z_index >= top_z_index ){
-        xpath = generateXpath(node);
-        last_xpath = xpath;
-        last_node = node;
-        top_z_index = z_index;
-      }
-    }
-    else{
-      last_node = node;
-    }
-  }
-
-	if(selector_enabled){
-		event.preventDefault();
-		event.stopPropagation();
-		document.removeEventListener("click", recorderClickListener, true);
-		chrome.runtime.sendMessage({msg: "setElementXpath", data: xpath});
-		selector_enabled = false;
-	}
-	else if(xpath.length > 0){
-    chrome.runtime.sendMessage(
-        {
-          msg: "addToPath",
-          data: {
-            url: window.location.toString(),
-            pathElement: {
-              element: {
-                type: "pageElement",
-                target: event.relatedTarget,
-                xpath: xpath
-              },
-              action: {
-                type: "action",
-                name: "click",
-                value: ""
-             }
-           }
-         }
-       },
-       function(response) {
-         //console.log("response ::  " +JSON.stringify(response));
-       }
-     );
-   }
+function isScript(element){
+  return element.tagName.toLowerCase() === "script";
 }
 
-  //build list of elements where the x,y coords and height,width encompass the event x,y coords
-  String.prototype.indexOfRegex = function(regex){
-    var match = this.match(regex);
-    return match ? this.indexOf(match[0]) : -1;
-  }
-
-	let executeTestElement = function(path_elem){
-		if(path_elem !== undefined && path_elem.url){
-			//if(path[idx].url !== window.location.toString()){
-			window.location.href = path_elem.url;
-			//Update the url here.
-			chrome.runtime.sendMessage({
-					msg: "redirect-tab",
-					data: path_elem.url
-			});
-		}
-		else if(path_elem && path_elem.element){
-			var xpathResult = document.evaluate(path_elem.element.xpath, document, null, XPathResult.ANY_TYPE, null).iterateNext();
-			//verify that element exists on page
-			if(xpathResult){
-				//perform action on element
-				if(path_elem.action.name === "click"){
-					xpathResult.click();
-				}
-				else if(path_elem.action.name === "doubleClick"){
-					xpathResult.doubleClick();
-				}
-				else if(path_elem.action.name === "sendKeys"){
-					xpathResult.value = path_elem.action.value;
-				}
-			}
-		}
-		else {
-			//console.log("Unknown path element experienced");
-		}
-	}
-  /*
-   * Runs a test from beginning to end
-   */
-  let runTest = function(path){
-    if(path.length && !path[0].url && localStorage.run_idx < path.length){
-      alert("Paths must start with a page");
-      return;
+function isHidden(element){
+  var parent = element;
+  //check if element is hidden
+  while(parent != undefined && parent != null){
+    if(getComputedStyle(parent).display === 'none' || getComputedStyle(parent).visibility === 'hidden' || getComputedStyle(parent).maxHeight == "0px"){
+      return true;
     }
-
-    //process elements
-		let test_interval = setInterval(function(){
-			if(parseInt(localStorage.run_idx) >= path.length){
-				clearInterval(test_interval);
-				return;
-			}
-			executeTestElement(path[localStorage.run_idx]);
-			localStorage.run_idx = parseInt(localStorage.run_idx, 10) + 1;
-			localStorage.last_url = window.location.toString();
-		}, 1000, path);
-
-		if(localStorage.run_idx >= path.length){
-			localStorage.status = "POST_RUN";
-		}
+    parent = parent.parentElement;
   }
+
+  return false;
+}
+
+function sRGBtoLin(colorChannel) {
+  // Send this function a decimal sRGB gamma encoded color value
+  // between 0.0 and 1.0, and it returns a linearized value.
+
+  if ( colorChannel <= 0.04045 ) {
+      return colorChannel / 12.92;
+  } else {
+      return Math.pow((( colorChannel + 0.055)/1.055),2.4);
+  }
+}
 
 /**
- *
- * Make plugin frame draggable by using the header to drag frame around
- *
- */
-let main = function(){
-   // Make the DIV element draggable:
-  function dragElement(elmnt) {
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+	 * Calculates luminosity from rgb color
+	 * 
+	 * @param red
+	 * @param green
+	 * @param blue
+	 * @return
+	 */
+ function calculatePercievedLightness(red, green, blue) {
+  //calculate luminosity
+  //For the sRGB colorspace, the relative luminance of a color is defined as
+  //where R, G and B are defined as:
+  
+  var RsRGB = red/255.0;
+  var GsRGB = green/255.0;
+  var BsRGB = blue/255.0;
 
-    function closeDragElement() {
-      // stop moving when mouse button is released:
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
-
-    function elementDrag(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // calculate the new cursor position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      // set the element's new position:
-      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-
-    function dragMouseDown(e) {
-      e = e || window.event;
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
-    }
-
-    if (document.getElementById(elmnt.id +"_header")) {
-      // if present, the header is where you move the DIV from:
-      document.getElementById(elmnt.id +"_header").onmousedown = dragMouseDown;
-    } else {
-      // otherwise, move the DIV from anywhere inside the DIV:
-      elmnt.onmousedown = dragMouseDown;
-    }
-  }
-
-  // Make the DIV element draggable:
-  dragElement(document.getElementById("qanairy_ide"));
-};
-
-var open_recorder = function(){
-  var elem = document.getElementById("qanairy_ide");
-  if(!elem){
-    renderRecorder();
-    elem = document.getElementById("qanairy_ide");
-  }
-  elem.style.display = "block";
-  main();
+  var R = sRGBtoLin(RsRGB);
+  var G = sRGBtoLin(GsRGB);
+  var B = sRGBtoLin(BsRGB);
+  
+  return 0.2126 * R + 0.7152 * G + 0.0722 * B ;
 }
 
-var renderRecorder = function(){
-   var iframe = document.createElement("iframe");
-   iframe.id="qanairy_ide_frame";
-   iframe.style.cssText = "position:absolute;width:300px;height:550px;z-index:998";
-   iframe.src = chrome.extension.getURL("/recorder.html");
-
-   var header_inner_html = "<span id='ide_close_icon' onclick=\"document.getElementById('qanairy_ide').style.display='none';localStorage.removeItem('path');\" style='display:block;cursor:pointer;z-index:999;position:absolute;top:0px; left:280px;height:20px;width:20px;margin:0px;padding:0px;color:#FFFFFF'><b>x</b></span>";
-   var header = document.createElement("div");
-   header.style.cssText = "width:300px;height:20px;z-index:998;background-color:#553fc0;cursor:grab";
-   header.id="qanairy_ide_header";
-   header.innerHTML = header_inner_html;
-
-   var body = document.createElement("div");
-   body.style.cssText = "width:100%;height:20px";
-   body.id="qanairy_ide_body";
-   body.appendChild(iframe);
-
-   var parent = document.createElement("div");
-   parent.style.cssText = "position:absolute;width:300px;height:600px;z-index:10000;left:20px;top:20px;padding:0px";
-   parent.id="qanairy_ide";
-   parent.style.display = "none";
-   parent.appendChild(header);
-   parent.appendChild(body);
-   document.body.appendChild(parent);
-};
-
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    if (request.msg === "start_recording"){
-      localStorage.status = "recording";
-
-      document.addEventListener("click", recorderClickListener, true);
-      document.addEventListener("keyup", recorderKeyupListener, true);
-      document.addEventListener("keydown", recorderKeydownListener, true);
-
-      sendResponse({status: "starting"});
+function doesExistInArray(text_array, lines){
+  for(var i=0; i<text_array.length; i++){
+    if(text_array[i].includes(lines)){
+      return true;
     }
-    else if (request.msg === "stop_recording") {
-      localStorage.status = "stopped";
+  }
 
-      document.removeEventListener("click", recorderClickListener, true);
-      document.removeEventListener("keyup", recorderKeyupListener, true);
-      document.removeEventListener("keydown", recorderKeydownListener, true);
+  return false;
+}
 
-      sendResponse({status: "stopping"});
-    }
-    else if(request.msg === "listen_for_element_selector"){
-      selector_enabled = true;
-      document.addEventListener("click", recorderClickListener, true);
-    }
-    else if (request.msg === "run_test"){
-      localStorage.run_idx = 0;
-      localStorage.status = "RUNNING";
-      if(request.data){
-        localStorage.path = JSON.stringify(request.data);
+/**
+ * Retrieves set of elements that own text. Text ownership is defined as having text within an
+ *   an element that belongs to that element and not any of it's children. 
+ */
+function getElementsThatOwnText(){
+  var elements = document.body.getElementsByTagName("*");
+  var text_elements = [];
+  var string_arr = [];
+  
+  for(var i=0; i < elements.length; i++) {
+    var lines = elements[i].textContent.split(/\r?\n/);
+    //remove lines with &npsp;
+    var scrubbed_lines = [];
+    for(var j=0; j < lines.length; j++){
+      if(lines[j].trim().length){
+        scrubbed_lines.push(lines[j]);
       }
-			localStorage.setItem("last_url", window.location.toString());
+    }
 
-			runTest(JSON.parse(localStorage.path));
+    if(!isScript(elements[i]) && scrubbed_lines.length == 1){
+      if(!doesExistInArray(string_arr, scrubbed_lines)){
+        text_elements.push(elements[i]);
+        string_arr.push(elements[i].textContent.trim());
+      }
     }
-    else if (request.action === "open_recorder"){
-      open_recorder();
+  }
+
+  return text_elements;
+}
+
+function getButtonElements(){
+  var button_elements = document.body.getElementsByTagName("button");
+  var button_class_elements = document.body.getElementsByClassName("button");
+
+  var elements = [];
+
+  if(button_elements != undefined){ 
+    for(var i=0; i < button_elements.length; i++) {
+      if(!isHidden(button_elements[i]) && getComputedStyle(button_elements[i]).backgroundColor != "rgba(0, 0, 0, 0)"){
+        elements.push(button_elements[i]);
+      }
     }
-    else if (request.action === "close_recorder"){
-      close_recorder();
+  }
+
+  if(button_class_elements != undefined){ 
+    for(var i=0; i < button_class_elements.length; i++) {
+      if(!isHidden(button_class_elements[i]) && getComputedStyle(button_class_elements[i]).backgroundColor != "rgba(0, 0, 0, 0)"){
+        elements.push(button_class_elements[i]);
+      }
     }
-		else if (request.msg === "update_path"){
-			localStorage.setItem("path", request.data);
-		}
-    return Promise.resolve("Dummy response to keep the console quiet");
+  }
+
+  return elements;
+}
+
+/**
+ * Convert rgba to rgb
+ * 
+ * @param {*} RGB_background 
+ * @param {*} RGBA_color 
+ * @returns 
+ */
+function rgba2rgb(RGB_background, RGBA_color)
+{
+    var alpha = RGBA_color.a;
+
+    return new Color(
+        (1 - alpha) * RGB_background.r + alpha * RGBA_color.r,
+        (1 - alpha) * RGB_background.g + alpha * RGBA_color.g,
+        (1 - alpha) * RGB_background.b + alpha * RGBA_color.b
+    );
+}
+
+/**
+ * Computes the contrast between 2 colors
+ * @param {*} color1 
+ * @param {*} color2 
+ */
+function calculateContrast(color1, color2){
+  /* color1 rgb deconstruction */
+  
+  var tmp_color_str = color1.replace(")", "");
+  tmp_color_str = tmp_color_str.replace("rgba(", "");
+  tmp_color_str = tmp_color_str.replace("rgb(", "");
+  tmp_color_str = tmp_color_str.replaceAll(" ", "");
+  var rgba1 = tmp_color_str.split(",");
+  
+  var red1 = rgba1[0];
+  var green1 = rgba1[1];
+  var blue1 = rgba1[2];
+  if(color1.includes("rgba(")){
+    var transparency1 = rgba1[3];
+
+    if(transparency1 > 0){
+      return 21.0;
+    }
+    else {
+      red1 = 255;
+      green1 = 255;
+      blue1 = 255;
+    }  
+  }
+
+  /* color1 rgb deconstruction */
+  var tmp_color_str2 = color2.replace(")", "");
+  tmp_color_str2 = tmp_color_str2.replace("rgba(", "");
+  tmp_color_str2 = tmp_color_str2.replace("rgb(", "");
+  tmp_color_str2 = tmp_color_str2.replaceAll(" ", "");
+  var rgba2 = tmp_color_str2.split(",");
+  
+  var red2 = rgba2[0];
+  var green2 = rgba2[1];
+  var blue2 = rgba2[2];
+  if(color2.includes("rgba(")){
+    var transparency2 = rgba2[3];
+    if(transparency2 > 0){
+      return 21.0;
+    }
+    else {
+      red2 = 255;
+      green2 = 255;
+      blue2 = 255;
+    }
+  }
+
+  var color_1_luminosity = calculatePercievedLightness(red1, green1, blue1);
+  var color_2_luminosity = calculatePercievedLightness(red2, green2, blue2);
+  
+  var max_luminosity = 0.0;
+  var min_luminosity = 0.0;
+
+  if(color_1_luminosity > color_2_luminosity) {
+    min_luminosity = color_2_luminosity;
+    max_luminosity = color_1_luminosity;
+  }
+  else {
+    min_luminosity = color_1_luminosity;
+    max_luminosity = color_2_luminosity;
+  }
+
+  return (max_luminosity + 0.05) / (min_luminosity + 0.05);
+}
+
+/**
+ * Checks if contrast meets AA compliance given font size and weight
+ * 
+ * @param {*} contrast 
+ * @param {*} font_size 
+ * @param {*} font_weight 
+ */
+function getIsAACompliant(contrast, font_size, font_weight){
+  if(font_size >= 18.0 && contrast >= 3.0){
+    return true;
+  }
+  else if(font_size >= 14.0 && font_weight >= 700 && contrast >= 3.0){
+    return true;
+  }
+  else if((font_size < 18.0 && contrast >= 4.5)){
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Checks if contrast meets AAA compliance given font size and weight
+ * 
+ * @param {*} contrast 
+ * @param {*} font_size 
+ * @param {*} font_weight 
+ */
+function getIsAAACompliant(contrast, font_size, font_weight){
+  if(font_size >= 18.0 && contrast >= 4.5){
+    return true;
+  }
+  else if(font_size >= 14.0 && font_weight >= 700 && contrast >= 4.5){
+    return true;
+  }
+  else if(font_size < 18.0 && contrast >= 7.0){
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Checks if contrast meets AA compliance given font size and weight
+ * 
+ * @param {*} contrast 
+ * @param {*} font_size 
+ * @param {*} font_weight 
+ */
+ function getIsNonTextAACompliant(contrast){
+  if(contrast >= 3.0){
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Checks if contrast meets AAA compliance given font size and weight
+ * 
+ * @param {*} contrast 
+ * @param {*} font_size 
+ * @param {*} font_weight 
+ */
+function getIsNonTextAAACompliant(contrast){
+  if(contrast >= 3.0){
+    return true;
+  }
+
+  return false;
+}
+
+function getTextSizeString(font_size, font_weight){
+  if(font_size >= 18 || (font_size >= 14 && font_weight >= 700)){
+    return "Large Text";
+  }
+
+  return "Small Text";
+}
+
+function getBackgroundColor(element){
+  parent = element;
+  while(parent != undefined && parent != null){
+    if( getComputedStyle(parent).backgroundColor != "rgba(0, 0, 0, 0)"){
+      return getComputedStyle(parent).backgroundColor;
+    }
+    parent = parent.parentElement;
+  }
+
+  return getComputedStyle(element).backgroundColor;
+}
+/**
+ * Checks all text elements for color contrast issues
+ * @param {*} event 
+ */
+function reviewTextContrast()
+{
+  var contrast_issues = [];
+
+  // GET ALL ELEMENTS THAT OWN TEXT
+  var elements = getElementsThatOwnText()
+  var idx = 0;
+  for(var i=0; i< elements.length; i++){
+    var element = elements[i];
+    var element_style = getComputedStyle(element);
+    //  GET TEXT COLOR
+    var text_color = element_style.color;
+    //  GET BACKGROUND COLOR
+    var bg_color = getBackgroundColor(element);
+    //  RETRIEVE FONT SIZE
+    var font_size = parseInt(element_style.fontSize, 10) * (72.0 / 96.0);
+    //  RETRIEVE FONT WEIGHT
+    var font_weight = element_style.fontWeight;
+
+    
+    //  CALCULATE CONTRAST VALUE
+    var contrast = calculateContrast(text_color, bg_color);
+    contrast = Math.round((contrast + Number.EPSILON) * 100) / 100
+
+    //  CHECK IF ELEMENT IS AA COMPLIANT
+    var is_aa_compliant = getIsAACompliant(contrast, font_size, font_weight);
+    //  CHECK IF ELEMENT IS AAA COMPLIANT
+    var is_aaa_compliant = getIsAAACompliant(contrast, font_size, font_weight);
+    
+    
+
+    //  IF NOT AA OR AAA COMPLAINT THEN ASSIGN CLASS TO EACH ELEMENT WITH ELEMENT ID SUCH THAT IT HAS THE FORMAT "TEXT_ELEMENT_$INDEX"
+    if(!is_aa_compliant || !is_aaa_compliant){
+      element.classList.add("text_element_"+idx);
+      //  CREATE NEW CONTRAST ISSUE
+
+      let issue = new ContrastIssue(rgbToHex(text_color), rgbToHex(bg_color), contrast, getTextSizeString(font_size, font_weight), "text_element_"+idx, is_aa_compliant, is_aaa_compliant);
+      //  ADD CONTRAST ISSUE TO ISSUE LIST
+      contrast_issues.push(issue);
+    }
+    idx = idx + 1;  
+  }
+
+  return contrast_issues;
+}
+
+function findParentWithDifferentBackground(element){
+  var parent = element.parentElement;
+  var element_bg_color = getComputedStyle(element).backgroundColor;
+  while(parent != undefined && parent != null){
+    if((getComputedStyle(parent).backgroundColor != element_bg_color && getComputedStyle(parent).backgroundColor != "rgba(0, 0, 0, 0)")){
+      return getComputedStyle(parent).backgroundColor;
+    }
+    parent = parent.parentElement;
+  }
+
+  if(getComputedStyle(element).backgroundColor == "rgba(0, 0, 0, 0)"){
+    return "rgb(255, 255, 255)";
+  }
+
+  return getComputedStyle(element).backgroundColor;
+}
+
+/**
+ * Checks all non text elements for color contrast issues
+ * @param {*} event 
+ */
+ function reviewNonTextContrast()
+ {
+  var contrast_issues = [];
+
+  // GET ALL ELEMENTS THAT OWN TEXT
+  var elements = getButtonElements();
+  var idx = 0;
+  for(var i=0; i< elements.length; i++){
+    var element = elements[i];
+    //  GET TEXT COLOR
+    var element_color = getComputedStyle(element).backgroundColor;
+    //  GET BACKGROUND COLOR
+    var bg_color = findParentWithDifferentBackground(element);
+
+    //  CALCULATE CONTRAST VALUE
+    var contrast = calculateContrast(element_color, bg_color);
+    //  CHECK IF ELEMENT IS AA COMPLIANT
+    var is_aa_compliant = getIsNonTextAACompliant(contrast);
+    //  CHECK IF ELEMENT IS AAA COMPLIANT
+    var is_aaa_compliant = getIsNonTextAAACompliant(contrast);
+
+    //  IF NOT AA OR AAA COMPLAINT THEN ASSIGN CLASS TO EACH ELEMENT WITH ELEMENT ID SUCH THAT IT HAS THE FORMAT "TEXT_ELEMENT_$INDEX"
+    if(!is_aa_compliant || !is_aaa_compliant){
+      element.classList.add("non_text_"+idx);
+      
+      //  CREATE NEW CONTRAST ISSUE
+      contrast = Math.round((contrast + Number.EPSILON) * 100) / 100
+
+      let issue = new ContrastIssue(rgbToHex(element_color), rgbToHex(bg_color), contrast, "non-text", "non_text_"+idx, is_aa_compliant, is_aaa_compliant);
+      //  ADD CONTRAST ISSUE TO ISSUE LIST
+      contrast_issues.push(issue);
+    }
+    idx = idx + 1;  
+  }
+
+  return contrast_issues;
+ }
+
+//window.addEventListener("message", receiveMessage, false);
+
+// Listen for messages from the popup.
+chrome.runtime.onMessage.addListener((msg, sender, response) => {
+  if(msg.method == "analyzeContrast"){
+    var s = document.documentElement.outerHTML; 
+
+    var text_contrast_issues = reviewTextContrast();
+    var non_text_contrast_issues = reviewNonTextContrast();
+    let contrast_issues = text_contrast_issues;
+
+    for(var i=0; i<non_text_contrast_issues.length; i++){
+      contrast_issues.push(non_text_contrast_issues[i]);
+    }
+    response(contrast_issues);
+  }
+  else if(msg.method == "viewIssue"){
+    if(element_ref != null){
+      element_ref.style.border = "";
+    }
+    //find element with the class in data
+    element_ref = $("."+msg.data);
+    element_ref.scrollIntoView();
+    var border_color = "red";
+    if(getComputedStyle(element_ref).backgroundColor == "(255,0,0)"){
+      border_color = "blue";
+    }
+    element_ref.style.border = "4px solid red";
+    response(true);
+  }
 });
 
-renderRecorder();
-main();
-if(localStorage.status === "recording" || localStorage.status === "editing" || localStorage.status === "RUNNING" || localStorage.status === "POST_RUN"){
-	document.getElementById("qanairy_ide").style.display = "block";
-  if(localStorage.status === "editing"){
-    //send path to recorder
-    chrome.runtime.sendMessage({
-        msg: "loadTest",
-        data: localStorage.test
-    });
-    localStorage.removeItem(status);
+class ContrastIssue {
+  constructor(foreground, background, contrast, type, element_ref, is_aa_compliant, is_aaa_compliant){
+    this.foreground_color = foreground;
+    this.background_color = background;
+    this.contrast = contrast;
+    this.type = type;
+    this.element_ref = element_ref;
+    this.is_aa_compliant = is_aa_compliant;
+    this.is_aaa_compliant = is_aaa_compliant;
   }
-  else if(localStorage.status === "RUNNING"){
-		open_recorder();
-		runTest(JSON.parse(localStorage.path));
-  }
-	else if(localStorage.status === "POST_RUN"){
-		localStorage.status = "";
-	}
 }
-
-
-// Called sometime after postMessage is called
-function receiveMessage(event)
-{
-  // Do we trust the sender of this message?
-  if (event.origin.includes("localhost") || event.origin.includes("qanairy.com")){
-    open_recorder();
-		localStorage.test = JSON.stringify(JSON.parse(event.data).test);
-		localStorage.path = JSON.stringify(JSON.parse(event.data).test.path);
-
-		chrome.runtime.sendMessage({
-        msg: "subscribe_to_platform",
-        data: JSON.parse(event.data).profile
-    });
-
-    chrome.runtime.sendMessage({
-        msg: "edit-test",
-        data: JSON.parse(localStorage.test)
-    });
-    localStorage.removeItem(status);
-  }
-
-  // event.source is window.opener
-  // event.data is "hello there!"
-
-  // Assuming you've verified the origin of the received message (which
-  // you must do in any case), a convenient idiom for replying to a
-  // message is to call postMessage on event.source and provide
-  // event.origin as the targetOrigin.
-  //event.source.postMessage("hi there yourself!  the secret response " +
-  //                         "is: rheeeeet!",
-  //                         event.origin);
-}
-
-window.addEventListener("message", receiveMessage, false);
