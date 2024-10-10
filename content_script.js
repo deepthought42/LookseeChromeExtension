@@ -1,4 +1,4 @@
-const $  = document.querySelector.bind(document);
+//const $  = document.querySelector.bind(document);
 var element_ref = null;
 
 /**
@@ -10,11 +10,17 @@ function componentToHex(c) {
 }
 
 /**
- * Converts rgb value to hex
- * @param {} r 
- * @param {*} g 
- * @param {*} b 
- * @returns 
+ * Converts an RGB or RGBA color string to its hexadecimal representation.
+ * 
+ * @param {string} rgb_string - The RGB or RGBA color string to convert.
+ * @returns {string} The hexadecimal representation of the color.
+ * 
+ * @precondition rgb_string must be a valid RGB or RGBA string in the format
+ *               "rgb(r, g, b)" or "rgba(r, g, b, a)", where r, g, b are integers
+ *               between 0 and 255, and a (if present) is a number between 0 and 1.
+ * @postcondition Returns a string in the format "#RRGGBB", where RR, GG, and BB
+ *                are two-digit hexadecimal values.
+ * @invariant The function does not modify any external state.
  */
 function rgbToHex(rgb_string) {
   var tmp_color_str = rgb_string.replace(")", "");
@@ -434,6 +440,55 @@ function findParentWithDifferentBackground(element){
 
   return contrast_issues;
  }
+
+/**
+ * Extracts all img elements from the document and identifies issues with alt text.
+ * 
+ * @returns {Array} An array of objects, each representing an image with potential issues.
+ * 
+ * @precondition The function is called in a browser environment with access to the DOM.
+ * @postcondition Returns an array of objects describing img elements and their alt text issues.
+ * @invariant The function does not modify any img elements or other parts of the DOM.
+ */
+function extractImagesWithAltIssues() {
+  // Select all img elements
+  const allImages = document.getElementsByTagName('img');
+  const issues = [];
+
+  // Helper function to check reading level
+  function checkReadingLevel(text) {
+    const words = text.trim().split(/\s+/);
+    const sentences = text.split(/[.!?]+/);
+    const avgWordsPerSentence = words.length / sentences.length;
+    const avgWordLength = words.join('').length / words.length;
+    
+    // Simple approximation: 8th grade level is roughly 14 words per sentence and 1.5 syllables per word
+    return avgWordsPerSentence <= 14 && avgWordLength <= 5;
+  }
+
+  Array.from(allImages).forEach((img, index) => {
+    const issue = { element: img, index: index, src: img.src };
+
+    if (!img.alt) {
+      // Scenario 1: Missing alt text
+      issue.type = 'missing';
+      issue.description = 'Image is missing alt text. Add descriptive alt text for accessibility.';
+    } else {
+      // Scenario 2: Check reading level of existing alt text
+      if (!checkReadingLevel(img.alt)) {
+        issue.type = 'complex';
+        issue.description = 'Alt text may be too complex. Aim for 8th grade reading level.';
+        issue.altText = img.alt;
+      }
+    }
+
+    if (issue.type) {
+      issues.push(issue);
+    }
+  });
+
+  return issues;
+}
 
 //window.addEventListener("message", receiveMessage, false);
 

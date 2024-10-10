@@ -1,0 +1,74 @@
+.tabs-container {
+    width: 100%;
+    margin-top: 20px;
+}
+  
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.tab {
+    flex: 1;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #f8f8f8;
+    border: none;
+    border-radius: 5px 5px 0 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tab:not(:last-child) {
+    margin-right: 2px;
+}
+
+.tab:hover {
+    background-color: #e8e8e8;
+}
+
+.tab.active {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    position: relative;
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #fff;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Ensure contrast ratio for active tab meets AAA WCAG requirements */
+.tab-button {
+    color: #000;
+}
+
+.tab-button.active {
+    color: #000;
+    background-color: #e0e0e0;
+}
+
+/* Remove media query for responsive design */

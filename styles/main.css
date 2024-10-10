@@ -1,11 +1,14 @@
 body {
-  padding: 0px !important;
-  margin: 0px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 100vh; /* Use full viewport height */
+  overflow: hidden; /* Prevent scrolling */
 }
 
 #looksee-ide {
-  width: 375px;
-  height: 600px;
+  width: 100%; /* Use full width */
+  height: 100%; /* Use full height */
+  overflow: auto; /* Add scrolling if content exceeds dimensions */
 }
 
 #analysis_container {

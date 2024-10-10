@@ -10,3 +10,11 @@ chrome.action.onClicked.addListener(function(tab) {
     width: 400
   });
 });
+
+// This script runs in the background
+chrome.action.onClicked.addListener((tab) => {
+  chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ['content_script.js']
+  });
+});
