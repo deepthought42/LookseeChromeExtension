@@ -6,8 +6,19 @@
 
 const $ = document.querySelector.bind(document);
 
+// The tab ID of the inspected page, passed from background.js via query param.
+const inspectedTabId = parseInt(new URLSearchParams(window.location.search).get('tabId'), 10);
+
 let issueList = [];
 let activeElement = null;
+
+/**
+ * Sends a message to the inspected page's content script.
+ */
+function sendToContentScript(message, callback) {
+  if (!inspectedTabId) return;
+  chrome.tabs.sendMessage(inspectedTabId, message, callback || function () {});
+}
 
 /**
  * Sets visibility of type-specific compliance labels.
@@ -48,12 +59,8 @@ function showContrastDetails() {
   const index = Array.prototype.indexOf.call(this.parentElement.children, this);
   const issue = issueList[index];
 
-  // Highlight the element on the page
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    if (tabs[0]) {
-      chrome.tabs.sendMessage(tabs[0].id, { method: 'viewIssue', data: issue.element_ref });
-    }
-  });
+  // Highlight the element on the inspected page
+  sendToContentScript({ method: 'viewIssue', data: issue.element_ref });
 
   // Update color previews
   $('#text_color').style.backgroundColor = issue.foreground_color;
@@ -95,21 +102,18 @@ function buildContrastIssuesList(issues) {
 }
 
 /**
- * Triggers contrast analysis on the active tab.
+ * Triggers contrast analysis on the inspected tab.
  */
 function analyzeContrast() {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    if (!tabs[0]) return;
-    chrome.tabs.sendMessage(tabs[0].id, { method: 'analyzeContrast' }, function (res) {
-      if (chrome.runtime.lastError || !res) return;
-      issueList = res;
-      $('#contrast_issues').innerHTML = buildContrastIssuesList(res);
+  sendToContentScript({ method: 'analyzeContrast' }, function (res) {
+    if (chrome.runtime.lastError || !res) return;
+    issueList = res;
+    $('#contrast_issues').innerHTML = buildContrastIssuesList(res);
 
-      const rows = document.querySelectorAll('.issue_row');
-      for (let i = 0; i < rows.length; i++) {
-        rows[i].addEventListener('click', showContrastDetails);
-      }
-    });
+    const rows = document.querySelectorAll('.issue_row');
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].addEventListener('click', showContrastDetails);
+    }
   });
 }
 
