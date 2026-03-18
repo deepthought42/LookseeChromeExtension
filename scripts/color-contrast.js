@@ -1,160 +1,118 @@
-//const { active } = require("auth0-chrome");
-const $  = document.querySelector.bind(document);
-
-var issue_list = [];
-var active_element = null;
 /**
- * Sets the values for the given issue
- * 
- * @param {*} issue 
+ * Popup UI logic for the Look-see color contrast analyzer.
  */
-function showContrastDetails(event){
-  if(active_element != null){
-    active_element.classList.remove("active_issue");
-  }
-  active_element = this;
-  active_element.classList.add("active_issue");
 
-  $('#empty_contrast_compliance').style.display = "none";
-  $('#contrast_compliance_section').style.display = "initial";
+'use strict';
 
-  const index = [...this.parentElement.children].indexOf(this)
-  let issue = issue_list[index];
+const $ = document.querySelector.bind(document);
 
-  //send message to content script with issue element_ref
-  chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
+let issueList = [];
+let activeElement = null;
 
-    chrome.tabs.sendMessage(tabs[0].id, { method: "viewIssue", data: issue.element_ref },
-      function (res) {
-        return;
-      }
-    )
-  });
+/**
+ * Sets visibility of type-specific compliance labels.
+ */
+function setComplianceDisplay(type) {
+  const isSmall = type === 'small text';
+  const isLarge = type === 'large text';
+  const isNonText = type === 'non-text';
 
+  const toggle = (selector, visible) => {
+    const el = $(selector);
+    if (el) el.style.display = visible ? 'initial' : 'none';
+  };
 
-  $("#text_color").style.backgroundColor = issue.foreground_color;
-  $("#text_hex_color").textContent = issue.foreground_color
-
-  $("#bg_color").style.backgroundColor = issue.background_color;
-  $("#bg_hex_color").textContent = issue.background_color
-
-  $("#contrast").textContent = issue.contrast;
-
-  if(issue.is_aa_compliant){
-    $("#aa_success").style.display = "initial";
-    $("#aa_fail").style.display = "none";
-  }
-  else {
-    $("#aa_success").style.display = "none";
-    $("#aa_fail").style.display = "initial";
-  }
-
-  if(issue.is_aaa_compliant){
-    $("#aaa_success").style.display = "initial";
-    $("#aaa_fail").style.display = "none";
-  }
-  else {
-    $("#aaa_success").style.display = "none";
-    $("#aaa_fail").style.display = "initial";
-  }
-
-  if(issue.type.toLowerCase() === "small text"){
-    $('#non_text_element_label') == null ? "" : $('#non_text_element_label').style.display = "none";
-    $('#text_element_label') == null ? "" : $('#text_element_label').style.display = "initial";
-    
-    $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "initial";
-    $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "initial";
-
-    $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "none";
-    $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "none";
-    
-    $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "none";
-    $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
-  }
-  else if(issue.type.toLowerCase() === "large text"){
-    $('#non_text_element_label') == null ? "" : $('#non_text_element_label').style.display = "none";
-    $('#text_element_label') == null ? "" : $('#text_element_label').style.display = "initial";
-
-    $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "initial";
-    $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "initial";
-
-    $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "none";
-    $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "none";
-
-    $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "none";
-    $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "none";
-  }
-  else if(issue.type.toLowerCase() === "non-text"){
-    $('#non_text_element_label') == null ? "" : $('#non_text_element_label').style.display = "initial";
-    $('#text_element_label') == null ? "" : $('#text_element_label').style.display = "none";
-
-    $('#aa_non_text') == null ? "" : $('#aa_non_text').style.display = "initial";
-    $('#aaa_non_text') == null ? "" : $('#aaa_non_text').style.display = "initial";
-
-    $('#aa_large_text') == null ? "" : $('#aa_large_text').style.display = "none";
-    $('#aaa_large_text') == null ? "" : $('#aaa_large_text').style.display = "none";
-    $('#aa_small_text') == null ? "" : $('#aa_small_text').style.display = "none";
-    $('#aaa_small_text') == null ? "" : $('#aaa_small_text').style.display = "none";
-    
-    $('#aa_small_text').style.display = "none";
-    $('#aaa_small_text').style.display = "none";
-  }
+  toggle('#text_element_label', !isNonText);
+  toggle('#non_text_element_label', isNonText);
+  toggle('#aa_small_text', isSmall);
+  toggle('#aaa_small_text', isSmall);
+  toggle('#aa_large_text', isLarge);
+  toggle('#aaa_large_text', isLarge);
+  toggle('#aa_non_text', isNonText);
+  toggle('#aaa_non_text', isNonText);
 }
 
 /**
- * Constructs HTML to display the given issue as a row
- * 
- * @param {*} issue 
- * @returns 
+ * Displays detail panel for a selected contrast issue.
  */
-function constructContrastIssueHtml(issue){
-  return "<div class='issue_row flex flex-row'>"
-          + "<div class='w-30percent flex items-center text-md pl-16'>"+ issue.type +"</div>"
-          + "<div class='w-60percent flex items-center justify-center text-md'>"+issue.contrast + "</div>"
-          + "<input type='hidden' val='"+ issue.element_ref +"'></div>";
-}
-
-function buildContrastIssuesList(contrast_issues){
-  let issue_html = "";
-  if(contrast_issues === undefined){
-    return "";
+function showContrastDetails() {
+  if (activeElement) {
+    activeElement.classList.remove('active_issue');
   }
+  activeElement = this;
+  activeElement.classList.add('active_issue');
 
-  contrast_issues.forEach(issue => {
-    issue_html += constructContrastIssueHtml(issue);
+  $('#empty_contrast_compliance').style.display = 'none';
+  $('#contrast_compliance_section').style.display = 'initial';
 
+  const index = Array.prototype.indexOf.call(this.parentElement.children, this);
+  const issue = issueList[index];
+
+  // Highlight the element on the page
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    if (tabs[0]) {
+      chrome.tabs.sendMessage(tabs[0].id, { method: 'viewIssue', data: issue.element_ref });
+    }
   });
 
-  return issue_html;
+  // Update color previews
+  $('#text_color').style.backgroundColor = issue.foreground_color;
+  $('#text_hex_color').textContent = issue.foreground_color;
+  $('#bg_color').style.backgroundColor = issue.background_color;
+  $('#bg_hex_color').textContent = issue.background_color;
+  $('#contrast').textContent = issue.contrast;
+
+  // Update compliance icons
+  $('#aa_success').style.display = issue.is_aa_compliant ? 'initial' : 'none';
+  $('#aa_fail').style.display = issue.is_aa_compliant ? 'none' : 'initial';
+  $('#aaa_success').style.display = issue.is_aaa_compliant ? 'initial' : 'none';
+  $('#aaa_fail').style.display = issue.is_aaa_compliant ? 'none' : 'initial';
+
+  setComplianceDisplay(issue.type.toLowerCase());
 }
 
-function analyzeContrast() {    
-  chrome.tabs.query({ active: true, currentWindow: false }, function (tabs) {
+/**
+ * Builds an HTML string for an issue row.
+ */
+function constructContrastIssueHtml(issue) {
+  const typeEscaped = issue.type.replace(/</g, '&lt;');
+  return '<div class="issue_row flex flex-row">'
+    + '<div class="w-30percent flex items-center text-md pl-16">' + typeEscaped + '</div>'
+    + '<div class="w-60percent flex items-center justify-center text-md">' + issue.contrast + '</div>'
+    + '</div>';
+}
 
-    chrome.tabs.sendMessage(tabs[0].id, { method: "analyzeContrast", data: "xxx" },
-      function (res) {
-        issue_list = res;
-        $("#contrast_issues").innerHTML = buildContrastIssuesList(res);
+/**
+ * Renders the full issues list HTML.
+ */
+function buildContrastIssuesList(issues) {
+  if (!issues || issues.length === 0) return '';
+  let html = '';
+  for (let i = 0; i < issues.length; i++) {
+    html += constructContrastIssueHtml(issues[i]);
+  }
+  return html;
+}
 
-        const issues = document.querySelectorAll('.issue_row');
-        issues.forEach(issue => {
-          issue.addEventListener('click', showContrastDetails);
-        });
-        
-        /* handle the response from background here */
-        if (!window.chrome.runtime.lastError) {
-          // message processing code goes here
-        } else {
-          // error handling code goes here
-        }
-        return true;
+/**
+ * Triggers contrast analysis on the active tab.
+ */
+function analyzeContrast() {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    if (!tabs[0]) return;
+    chrome.tabs.sendMessage(tabs[0].id, { method: 'analyzeContrast' }, function (res) {
+      if (chrome.runtime.lastError || !res) return;
+      issueList = res;
+      $('#contrast_issues').innerHTML = buildContrastIssuesList(res);
+
+      const rows = document.querySelectorAll('.issue_row');
+      for (let i = 0; i < rows.length; i++) {
+        rows[i].addEventListener('click', showContrastDetails);
       }
-    )
+    });
   });
-  //chrome.runtime.sendMessage({action:"analyzeContrast", data:{}});
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  $("#analyzeButton").addEventListener("click", analyzeContrast);
+document.addEventListener('DOMContentLoaded', function () {
+  $('#analyzeButton').addEventListener('click', analyzeContrast);
 });
-
